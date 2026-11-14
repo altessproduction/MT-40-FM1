@@ -27,9 +27,14 @@ typedef struct {
     uint8_t roots[4];                     /* the four bars' bass roots as written (MIDI 28..50) */
     uint8_t chords[4];                    /* the skank stabs' chord root per bar (pitch class used) */
     uint8_t skank_qual;                   /* the stabs' chord as written: MT40_Q_* */
-    uint8_t drum_lane[MT40_STEPS];        /* the hit's lane 0..7 (DRUM_LANE_NOTE), MT40_REST none */
+    uint8_t drum_lane[MT40_STEPS];        /* the hit's lane 0..7 (DRUM_LANE_NOTE); 240 + lane
+                                           * a single hit, the low nibble lane and the high
+                                           * nibble the step's second lane a double hit (the
+                                           * backbeats' kick and snare unisons), MT40_REST none */
     uint8_t drum_vel[MT40_STEPS];
-    uint8_t bass_deg[MT40_STEPS];         /* semitones over the bar's root; MT40_CUT ends the hold */
+    uint8_t bass_deg[MT40_STEPS];         /* semitones over the bar's root; 240..254 the
+                                           * semitones below it (239 - byte, the sub-root
+                                           * walks); MT40_CUT ends the hold */
     uint8_t bass_vel[MT40_STEPS];
     uint8_t skank_vel[MT40_STEPS];        /* the stab's velocity, 0 = none; its root is the bar's */
 } mt40_riddim_t;

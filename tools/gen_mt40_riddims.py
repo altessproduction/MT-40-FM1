@@ -34,6 +34,12 @@ CUT = 253           # MT40_CUT in mt40.h: the held note ends there
 # is kept, and the DRUM engine scales by velocity).
 LANE_OF_GM = {36: 0, 38: 1, 40: 1, 39: 2, 42: 3, 46: 4, 45: 5, 47: 5, 37: 6, 56: 7}
 LANE_GLYPH = "KSPHOTRC"   # a grid's glyph per lane: K kick, S snare, P clap, H hat, O open, T tom, R rim, C cowbell
+# The encodings of mt40.h (v0.6): a drum step carries ONE byte, 240 + lane a single hit,
+# the low nibble lane and the high nibble the step's second lane a double hit (the back-
+# beats' kick and snare unisons); a bass degree 240..254 is 239 - byte semitones BELOW the
+# bar's root (the transcription's sub-root walks). riddims.json stores them plain: the
+# drums as [step, lane, velocity] or [step, lane, velocity, second lane], the bass degrees
+# as negative integers.
 
 # The BPMs of SLOOP Dub 1.6 (their gen_riddims.py's comment, "BPMs for the docs").
 SLOOP_BPM = {
@@ -110,8 +116,11 @@ def validate(doc):
             assert 28 <= x <= 50, f"{n}: a root out of the bass' range"
         assert r["skank_qual"] in (0, 1, 2), f"{n}: skank_qual"
         seen = set()
-        for st, lane, vel in r["drums"]:
+        for ev in r["drums"]:
+            st, lane, vel = ev[0], ev[1], ev[2]
+            lane2 = ev[3] if len(ev) > 3 else None
             assert 0 <= st < STEPS and lane in range(8) and 0 < vel <= 127, f"{n}: a drum hit {st},{lane}"
+            assert lane2 is None or lane2 in range(8), f"{n}: a drum second lane {lane2}"
             assert st not in seen, f"{n}: step {st} hit twice (drums)"
             seen.add(st)
         seen = set()
@@ -122,7 +131,7 @@ def validate(doc):
                 assert held, f"{n}: a cut with nothing held (step {st})"
                 held = False
             else:
-                assert 0 <= deg <= 16, f"{n}: bass step {st}: degree {deg}"
+                assert -15 <= deg <= 16, f"{n}: bass step {st}: degree {deg}"
                 assert st not in seen, f"{n}: step {st} twice (bass)"
                 seen.add(st)
                 held = True
@@ -162,11 +171,18 @@ def emit_h(doc):
     rows.append(" * (altessproduction, https://github.com/altessproduction/sloop-dub-fm1, GPL-3.0-only),")
     rows.append(" * reggae, dub, roots, ska, the Studio One and early-digital classics, dancehall,")
     rows.append(" * UK bass music and the Casio MT-40's six auto-rhythms -- the machine's three parts")
-    rows.append(" * (drums, bass, skank; v0.5 dropped the melody, T1 of the sequencer stays free). Four")
+    rows.append(" * (drums, bass, skank; v0.5 dropped the melody, T1 of the sequencer stays free). Five of")
+    rows.append(" * them (GUNMAN, HEAVENLESS, SLENG TENG, TEMPO, PEANY PEANY) are v0.6's rebuilds from the")
+    rows.append(" * BaroqueDub MIDI transcriptions (CC-Sampling-1.0, tools/baroquedub_riddims_data.py):")
+    rows.append(" * the recording's own bass lines and drum takes, the skank staying the bank's session")
+    rows.append(" * part. Four")
     rows.append(" * bars of sixteenths; the bass rides the bar's root (the MT-40 keyboard re-roots it)")
     rows.append(" * and never holds: every note re-strikes as the machine plucks (tools/mt40_bass.py,")
     rows.append(" * the Rock pattern's articulation), a rest HOLDS the re-strike (written as a TIE by")
-    rows.append(" * mt40.c) and MT40_CUT (253) ends the held note. */")
+    rows.append(" * mt40.c) and MT40_CUT (253) ends the held note. The encodings: drum_lane 240 + lane")
+    rows.append(" * is a single hit, the low nibble lane and the high nibble the step's second lane a")
+    rows.append(" * double hit (the backbeats' kick and snare unisons); bass degrees 240..254 are")
+    rows.append(" * 239 - byte semitones below the bar's root (Heavenless's sub-root walk G E G G#). */")
     rows.append("#ifndef FELUCCA_MT40_RIDDIMS_H")
     rows.append("#define FELUCCA_MT40_RIDDIMS_H")
     rows.append('#include "mt40.h"')
@@ -175,11 +191,12 @@ def emit_h(doc):
     for r in doc["riddims"]:
         drums = [REST] * STEPS
         dvel = [0] * STEPS
-        for st, lane, vel in r["drums"]:
-            drums[st] = lane
+        for ev in r["drums"]:
+            st, lane, vel = ev[0], ev[1], ev[2]
+            drums[st] = lane | ((ev[3] if len(ev) > 3 else 15) << 4)
             dvel[st] = vel
         bass = expand_bass(r)
-        bdeg = [b[0] if b[2] else REST for b in bass]
+        bdeg = [(b[0] if b[0] >= 0 else 239 - b[0]) if b[2] else REST for b in bass]
         bvel = [b[1] for b in bass]
         skv = [0] * STEPS
         for st, vel in r["skank"]:
@@ -208,11 +225,12 @@ def emit_h(doc):
     return "\n".join(rows) + "\n"
 
 
-def grid_line(hits, width, glyph):
-    """the hits of a track as one line of cells, | every beat, + every bar"""
+def grid_line(hits, width, glyph, cell=None):
+    """the hits of a track as one line of cells, | every beat, + every bar; cell(st) is
+    the whole cell's text when a track writes more than one glyph into it"""
     line = ""
     for st in range(width):
-        line += glyph(hits[st]) if glyph else ("x" if hits[st] else ".")
+        line += cell(st) if cell else (glyph(hits[st]) if glyph else ("x" if hits[st] else "."))
         line += "|" if st % 4 == 3 else ""
         if st % 16 == 15:
             line = line[:-1] + "+"
@@ -224,14 +242,19 @@ def emit_md(doc):
     rows.append("# MT-40X — riddim grids (calibration sheet)")
     rows.append("")
     rows.append("Generated by `tools/gen_mt40_riddims.py` from `riddims.json` — the printable form of the bank")
-    rows.append("(source: SLOOP Dub 1.6, altessproduction, GPL-3.0-only). The calibration workflow:")
-    rows.append("compare with the real MT-40, correct `riddims.json`, regenerate (`python3 tools/gen_mt40_riddims.py`).")
+    rows.append("(sources: SLOOP Dub 1.6, altessproduction, GPL-3.0-only; GUNMAN, HEAVENLESS, SLENG TENG, TEMPO")
+    rows.append("and PEANY PEANY are v0.6's rebuilds from the BaroqueDub MIDI transcriptions, CC-Sampling-1.0,")
+    rows.append("tools/baroquedub_riddims_data.py — the recording's own bass lines and drum takes). The calibration")
+    rows.append("workflow: compare with the real MT-40 and the original recordings, correct `riddims.json`,")
+    rows.append("regenerate (`python3 tools/gen_mt40_riddims.py`).")
     rows.append("")
-    rows.append("One cell = a sixteenth, four bars of 16 (the `+` closes a bar). The drums: one hit a step")
-    rows.append("at the most, the glyph is the lane (**K**ick, **S**nare, cla**P**, **H**at, **O**pen hat, **T**om, **R**im, **C**owbell,")
-    rows.append("`.` = nothing). The bass: the interval over the bar's root (`1` the root, `b3`, `4`, `5`, `b7`, `6`,")
-    rows.append("`8` the octave... `.` a rest that HOLDS, `x` the step where the held note ends (MT40_CUT));")
-    rows.append("the bank v0.5 re-strikes every hold as the machine plucks (tools/mt40_bass.py): the same")
+    rows.append("One cell = a sixteenth, four bars of 16 (the `+` closes a bar). The drums: the glyph is the lane")
+    rows.append("(**K**ick, **S**nare, cla**P**, **H**at, **O**pen hat, **T**om, **R**im, **C**owbell, `.` = nothing); a second")
+    rows.append("letter in lower case is the step's second hit (the backbeats' kick and snare unisons, one")
+    rows.append("velocity for both). The bass: the interval over the bar's root (`1` the root, `b3`, `4`, `5`, `b7`, `6`,")
+    rows.append("`8` the octave, `-N` the N semitones BELOW it — Heavenless's G E G G# walk; `.` a rest that")
+    rows.append("HOLDS, `x` the step where the held note ends (MT40_CUT));")
+    rows.append("the bank re-strikes every hold as the machine plucks (tools/mt40_bass.py): the same")
     rows.append("interval written on the next cells is the note struck again, the glyph carries no velocity.")
     rows.append("")
     NOTE_N = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7", "8", "b9", "9", "#9", "10"]
@@ -246,13 +269,31 @@ def emit_md(doc):
                     f"chord: {['MAJ', 'MIN', 'DOM7'][r['skank_qual']]}")
         rows.append("")
         drums = [None] * STEPS
-        for st, lane, _vel in r["drums"]:
-            drums[st] = lane
+        drums2 = [None] * STEPS
+        for ev in r["drums"]:
+            drums[ev[0]] = ev[1]
+            if len(ev) > 3:
+                drums2[ev[0]] = ev[3]
+
+        def dcell(st, drums=drums, drums2=drums2):
+            if drums[st] is None:
+                return "."
+            g = LANE_GLYPH[drums[st]]
+            if drums2[st] is not None:
+                g += LANE_GLYPH[drums2[st]].lower()
+            return g
         rows.append("```")
-        rows.append("DRUM " + grid_line(drums, STEPS, lambda l: LANE_GLYPH[l] if l is not None else "."))
+        rows.append("DRUM " + grid_line(drums, STEPS, None, dcell))
         bass = expand_bass(r)
-        bglyph = lambda b: "." if b[2] == 0 else ("x" if b[2] == 2 else NOTE_N[b[0]])
-        rows.append("BASS " + grid_line(bass, STEPS, bglyph))
+
+        def bglyph(b):
+            if b[2] == 0:
+                return "."
+            if b[2] == 2:
+                return "x"
+            return NOTE_N[b[0]] if b[0] >= 0 else "-%d" % -b[0]
+        rows.append("BASS " + grid_line(bass, STEPS, None,
+                                       lambda st, bass=bass, bglyph=bglyph: bglyph(bass[st])))
         skv = [0] * STEPS
         for st, vel in r["skank"]:
             skv[st] = vel
@@ -273,7 +314,7 @@ def main():
     else:
         with open(JSON_PATH) as f:
             doc = json.load(f)
-        assert doc.get("format") == "mt40x-riddims-2", "riddims.json: wrong format (mt40x-riddims-2, the v0.5 bank)"
+        assert doc.get("format") == "mt40x-riddims-3", "riddims.json: wrong format (mt40x-riddims-3, the v0.6 bank)"
     validate(doc)
     with open(H_PATH, "w") as f:
         f.write(emit_h(doc))

@@ -1,10 +1,29 @@
-# MT-40X v0.5 — le Casio MT-40/41 sur le M-VAVE FM-1
+# MT-40X v0.6 — le Casio MT-40/41 sur le M-VAVE FM-1
 
 MT-40X est une fourche (fork) du firmware libre **Felucca v1.8.2** (Hügelton Instruments,
 GPL-3.0) qui ajoute au FM-1 l'accompagnement automatique du **Casio MT-40 / MT-41** : la
-banque de riddims, le clavier de basse, le synchro start. La banque de riddims est celle de
+banque de riddims, le clavier de basse, le synchro start. La banque part de celle de
 **SLOOP Dub 1.6** (altessproduction, <https://github.com/altessproduction/sloop-dub-fm1>,
-GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le firmware.
+GPL-3.0) : **les vingt-huit riddims** convertis dans le firmware — dont cinq classiques
+(GUNMAN, HEAVENLESS, SLENG TENG, TEMPO, PEANY PEANY) reconstruits en v0.6 d'après les
+transcriptions MIDI de **BaroqueDub**
+(<https://baroquedub.co.uk/archive/audio_riddims.html>, CC-Sampling-1.0) : la basse et la
+batterie des prises originales, le skank restant la partie « session » de la banque.
+
+## Nouveau dans la v0.6 (par rapport à la v0.5)
+
+- **Cinq riddims refaits d'après les enregistrements** : la ligne mythique du Sleng Teng
+  revient avec ses répétitions (C# D D D ×3 puis G · F#), le Heavenless rejoue son
+  martèlement A-A-A-A et sa marche G-E-G# sous la fondamentale (degrés négatifs du
+  `bass_deg`), le Gunman sa marche G-F-F#, le Tempo son steppers à 70 bpm avec le skank
+  d'origine, le Peanie Peanie son steppers au kick serré. La batterie gagne les **hits
+  doubles** (un pas peut porter deux lanes — les unissons kick/caisse des contretemps).
+- **Toute la banque re-frappée sur les quatre mesures** : la v0.5 ne martelait que la
+  première mesure (un défaut de `mt40_bass.articulate`) — c'est ce qu'entendaient les
+  joueurs (« il manque des répétitions de note sur la basse »). Les vingt-trois riddims
+  SLOOP Dub regagnent leurs pincés partout (660 → 1 208 frappes, la banque à 1 512).
+- Détails et grilles : [GUIDE-RIDDIMS.md](GUIDE-RIDDIMS.md),
+  [MT40X-CHANGELOG.md](MT40X-CHANGELOG.md).
 
 ## Nouveau dans la v0.5 (par rapport à la v0.4)
 

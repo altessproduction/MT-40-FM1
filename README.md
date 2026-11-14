@@ -102,7 +102,7 @@ Puis, pas à pas :
 
 1. **Sauvegardez** vos projets, presets et échantillons (SAVE &gt; PROJECT, ou l'éditeur
    web) — la règle avant toute manipulation de firmware.
-2. **Flashez** `mt40x_v1.8.2-0.5.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
+2. **Flashez** `mt40x_v1.8.2-0.6.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
    démarrage affiche « MT-40X v1.8.2-mt40x ».
 3. **MENU &gt; AUDIO &gt; RIDDIM** : sur la ligne RIDDIM, tournez **OCT+** — chaque cran
    charge le riddim (les trois pistes, le tempo, **les sons MT-40**) et le nom s'affiche
@@ -117,7 +117,7 @@ Puis, pas à pas :
 | T1 | **libre** — le riddim n'a pas de mélodie, jouez-y la vôtre | rien (votre son, vos réglages) |
 | T2 | le skank : l'accord de la mesure (racine, tierce, quinte, + septième) | GATE 40, VOICE POLY |
 | T3 | la basse : le groove au-dessus de la racine de mesure, re-frappé comme la machine | GATE 127, VOICE MONO |
-| T4 | la batterie (un hit par pas au plus, vélocités d'origine) | LEN 64, DIV 1/16 |
+| T4 | la batterie (un ou deux hits par pas — les unissons kick/caisse des contretemps —, vélocités d'origine) | LEN 64, DIV 1/16 |
 
 **Les sons MT-40 posés au chargement (v0.4)** : T2 et T3 reçoivent des timbres ANALOG dans
 l'esprit Casiotone — T3 la pluck carrée creuse de la basse, T2 l'attaque courte du skank —
@@ -125,7 +125,17 @@ posés à chaque chargement de riddim, avec vos LEVEL, PAN, envois d'effets et I
 conservés. Ce sont des approximations à ajuster l'OSC/FLT de la piste ; la banque fidèle
 des 22 timbres est la calibration à venir.
 
-**Limites connues (v0.5)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
+**Les riddims refaits d'après les enregistrements (v0.6)** : GUNMAN, HEAVENLESS, SLENG
+TENG, TEMPO et PEANY PEANY sont reconstruits à partir des transcriptions MIDI de
+BaroqueDub (<https://baroquedub.co.uk/archive/audio_riddims.html>, CC-Sampling-1.0) — la
+basse et la batterie sont **celles des prises originales** (le Sleng Teng retrouve ses
+répétitions C#-D-D-D, le Heavenless sa marche A-G-E-G# sous la fondamentale, le Tempo son
+steppers à 70 bpm), le skank reste la partie « session » de la banque. Les vingt-trois
+autres riddims gardent leurs grilles SLOOP Dub, re-frappées désormais sur les quatre
+mesures (la v0.5 ne martelait que la première). Détails dans
+[GUIDE-RIDDIMS.md](docs/mt40x/GUIDE-RIDDIMS.md).
+
+**Limites connues (v0.6)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
 sauvegardé dans le projet — rechargez après extinction (les pistes, elles, restent si vous
 sauvegardez le projet) ; MT-40X armé, les touches ne sonnent pas (jouez au MIDI ou
 désarmez) ; le registre du skank reste celui de la banque (57…68) ; les patterns font 4
@@ -190,7 +200,7 @@ chemin audio, le clavier MAJ / +1 MIN / +2 DOM7 — finit sur `AUDIO-PATH-OK`.
 
 ## 6. Installer le firmware
 
-Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.5.fwsc`** (dans les assets de
+Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.6.fwsc`** (dans les assets de
 la release GitHub, avec le `.bin` applicatif, les `SHA256SUMS` et les licences). Il
 **inclut le loader de mise à jour** : vous pouvez toujours en ressortir, vers V15 ou vers
 un autre firmware.
@@ -247,7 +257,7 @@ JIELI_TOOLCHAIN=/chemin/toolchain AC79_SDK=/chemin/fw-AC79_AIoT_SDK ./build.sh -
 
 - Prérequis et SDK : **[BUILDING.md](BUILDING.md)** (toolchain JieLi pi32v2 —
   `tools/get_toolchain.sh` — et SDK AC79 ; Pillow pour les tables générées).
-- Le build produit `build/mt40x_v1.8.2-0.5.fwsc` et `build/release-0.4/` (paquet, `.bin`,
+- Le build produit `build/mt40x_v1.8.2-0.6.fwsc` et `build/release-0.6/` (paquet, `.bin`,
   `SHA256SUMS`, licences, attribution des échantillons).
 - **La banque de riddims** : `riddims.json` est la source de vérité ;
   `python3 tools/gen_mt40_riddims.py` régénère `firmware/src/mt40_riddims.h` et les grilles

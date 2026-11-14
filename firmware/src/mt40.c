@@ -2,10 +2,14 @@
  * Copyright (C) 2026 MT-40X contributors (Felucca by Leo Kuroshita / Hugelton Instruments,
  * riddim bank by altessproduction's SLOOP Dub 1.6, both GPL-3.0-only) */
 /* MT-40X: mt40.h's side. One riddim = the machine's three tracks:
- *   T4 the drums (the DRUM engine, one lane hit a step at the most, velocities kept),
+ *   T4 the drums (the DRUM engine, one velocity a step: a single lane hit, or two --
+ *      drum_lane's low and high nibbles -- when the transcription's backbeat strikes
+ *      its kick and its snare together, velocities within twenty of each other),
  *   T3 the bass (the groove rides the bar's root and never holds -- every note re-strikes
  *      as the machine plucks it, tools/mt40_bass.py; a rest HOLDS the re-strike, written
- *      as a TIE; MT40_CUT releases: the plucked tails the MT-40's bass lives on),
+ *      as a TIE; MT40_CUT releases: the plucked tails the MT-40's bass lives on. The
+ *      degrees 240..254 are the semitones below the bar's root, the sub-root walks of
+ *      the BaroqueDub transcriptions, v0.6).
  *   T2 the skank (the stabs, real chords: the bar's root with the chord's quality).
  *   T1 stays the user's: the melody was SLOOP Dub's toaster's voice, the machine has none
  *   (v0.5 dropped it; the load empties the track, its sound and its settings stay).
@@ -124,7 +128,9 @@ static __attribute__((noinline)) void mt40_voice(int32_t root)
             while (last7 > b * 16u && r->bass_deg[last7 - 1u] == 7u)
                 last7--;                     /* back: the strike of the run (a pluck at 15) */
         }
-        /* T3 the bass: a written note strikes, a rest holds it (TIE), MT40_CUT ends it */
+        /* T3 the bass: a written note strikes, a rest holds it (TIE), MT40_CUT ends it.
+         * The degrees 240..254 are the semitones below the bar's root (239 - byte): the
+         * transcription's sub-root walks, Heavenless's G E G G# over its A */
         for (s = b * 16u; s < b * 16u + 16u; s++) {
             uint32_t deg = r->bass_deg[s];
             track_t *t = &trk[2];
@@ -134,8 +140,12 @@ static __attribute__((noinline)) void mt40_voice(int32_t root)
                 mt40_rest(t, s);
                 t->step[s].time = ST_TIE;            /* a hold the engine keeps while it sounds */
             } else {
-                mt40_note(t, s, (uint8_t)(rroot + mt40_deg(deg, qual,
-                                                           s >= last7 && s <= last7end)), r->bass_vel[s], 0);
+                int32_t d;
+                if (deg >= 240u)                     /* the sub-root walk, no variant */
+                    d = 239 - (int32_t)deg;
+                else
+                    d = (int32_t)mt40_deg(deg, qual, s >= last7 && s <= last7end);
+                mt40_note(t, s, (uint8_t)((int32_t)rroot + d), r->bass_vel[s], 0);
             }
         }
         /* T2 the skank: the bar's chord, the stab's velocity; the rests release */
@@ -164,9 +174,14 @@ static void mt40_drums(const mt40_riddim_t *r)
     }
     for (s = 0; s < MT40_STEPS; s++) {
         mt40_rest(t, s);
-        if (r->drum_lane[s] != MT40_REST) {
+        uint32_t lv = r->drum_lane[s];
+        if (lv != MT40_REST) {
             step_t *st = &t->step[s];
-            st->hit = (uint8_t)(1u << r->drum_lane[s]);
+            st->hit = (uint8_t)(1u << (lv & 15u));   /* 240 + lane: the single hit */
+            if ((lv >> 4) != 15u)                    /* the high nibble: the step's second
+                                                      * lane, the backbeats' kick and snare
+                                                      * unisons (one velocity for both) */
+                st->hit |= (uint8_t)(1u << (lv >> 4));
             st->time = ST_NOTE;
             st->vel = r->drum_vel[s];
         }

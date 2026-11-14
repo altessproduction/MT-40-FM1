@@ -1,4 +1,4 @@
-# MT-40X — guide des 28 riddims (banque SLOOP Dub 1.6, l'articulation de la machine)
+# MT-40X — guide des 28 riddims (SLOOP Dub 1.6, les transcriptions BaroqueDub, l'articulation de la machine)
 
 La banque part des vingt-huit riddims de SLOOP Dub 1.6
 (<https://github.com/altessproduction/sloop-dub-fm1>, étiquette v1.6) : quatre mesures de
@@ -6,8 +6,13 @@ seize doubles-croches, **les trois parties de la MT-40** (basse, skank, batterie
 a retiré la mélodie, qui était la voix du toaster chez SLOOP Dub ; la machine n'en a pas,
 T1 du séquenceur reste la vôtre), chaque vélocité et chaque racine de mesure d'origine.
 La v0.5 y ajoute l'articulation de la machine : **la basse ne tient jamais une note, elle
-re-frappe** (détail plus bas). Le fichier source de la banque est `riddims.json` ; les
-grilles imprimables sont dans `riddims_grids.md`.
+re-frappe** (détail plus bas) — sur les quatre mesures depuis la v0.6, qui a corrigé le
+défaut qui ne martelait que la première. La v0.6 reconstruit en plus cinq classiques
+(**GUNMAN, HEAVENLESS, SLENG TENG, TEMPO, PEANY PEANY**) d'après les transcriptions MIDI
+de BaroqueDub (<https://baroquedub.co.uk/archive/audio_riddims.html>, CC-Sampling-1.0) :
+la basse et la batterie sont celles des prises originales, le skank reste la partie
+« session » de la banque. Le fichier source de la banque est `riddims.json` ; les grilles
+imprimables sont dans `riddims_grids.md`.
 
 ## La banque
 
@@ -26,17 +31,17 @@ automatiques du Casio MT-40 (le Rock de la machine est le SLENG TENG ci-dessus).
 | 6 | DUB CUT | 74 | A1 A1 F2 F2 | dub à trous, la basse coupée |
 | 7 | ZION | 68 | D2 A1 D2 E2 | roots qui monte |
 | 8 | SKA | 88 | A2 A2 F2 G2 | la marche ska |
-| 9 | HEAVENLESS | 80 | A1 F2 A1 G2 | Vin Gordon, Studio One 1968 |
+| 9 | HEAVENLESS | 77 | A1 ×4 | Augustus Pablo 1976 — la v0.6 rejoue la prise : le martèlement A et la marche G-E-G# sous la fondamentale |
 | 10 | TONIGHT | 84 | E2 A2 G2 E2 | Keith & Tex 1967, la basse roulante |
 | 11 | GET IN GROOVE | 88 | F2 A2 G2 F2 | Studio One 1968 (Up Park Camp) |
 | 12 | HOT MILK | 92 | C2 F2 G2 C2 | Jackie Mittoo 1968 |
 | 13 | ANSWER | 82 | A1 A1 A1 A1 | l'accord unique, Slim Smith 1967 |
 | 14 | PROMISED LAND | 78 | F2 A#2 C2 G2 | Dennis Brown 1981 (avec Aswad) |
-| 15 | GUNMAN | 78 | C2 C2 G#1 A#1 | Michael Prophet 1980, la marche lourde des Roots Radics |
+| 15 | GUNMAN | 78 | G1 ×4 | Michael Prophet 1980 — la v0.6 rejoue la prise : la marche G-F-F# des Roots Radics |
 | 16 | HERE I COME | 95 | A1 C2 D2 E2 | Barrington Levy 1985, la pompe en octaves |
 | 17 | SLENG TENG | 82 | C#2 ×4 | le Rock du MT-40 — Wayne Smith, King Jammy's 1985 |
-| 18 | TEMPO | 88 | A1 C2 D2 A1 | Anthony Red Rose 1985, Firehouse |
-| 19 | PEANY PEANY | 92 | A1 C2 A1 E2 | le rebond numérique (Fade Away) 1987 |
+| 18 | TEMPO | 70 | A1 ×4 | Anthony Red Rose 1985, Firehouse — la v0.6 rejoue la prise : le steppers à 70 bpm, la basse Am→F, le skank d'origine |
+| 19 | PEANY PEANY | 81 | D2 ×4 | le rebond numérique (Fade Away) 1987 — la v0.6 rejoue la prise : le steppers au kick serré, la basse D dorien |
 | 20 | DANCEHALL | 95 | A1 D2 A1 G2 | le clap 3+3+2 |
 | 21 | DEMBOW | 100 | A1 A1 E2 E2 | boom-ch-boom-chick |
 | 22 | JUNGLE | 172 | A1 A1 C2 G1 | les subs de la jungle |
@@ -51,6 +56,35 @@ Le Sleng Teng est la transcription vérifiée (l'onglet de Noel Davey, le roll A
 bpm) : la fondamentale sur le temps, trois doubles-croches un demi-ton au-dessus, la queue
 une quinte au-dessus, coupée court — les racines de mesure restent C#, les accords du skank
 montent au-dessus (C#, B, A, B).
+
+## Les cinq refaits BaroqueDub (v0.6)
+
+Les transcriptions MIDI de BaroqueDub donnent la section rythmique des prises originales
+(`tools/baroquedub_riddims_data.py`, les événements quantisés ; `tools/midi_riddims.py`,
+la conversion) :
+
+- **SLENG TENG** — la ligne C# D D D | C# D D D | C# D D D | G · F# ·, chaque D
+  re-frappé, le G et le F# coupés là où la note s'arrête. La batterie retrouve les
+  unissons kick/caisse et kick/snare des contretemps (les **hits doubles** : un pas de
+  grille peut porter deux lanes, vélocité commune quand les deux frappes sont voisines).
+- **HEAVENLESS** — le martèlement A-A-A-A (une frappe par double-croche) et la marche
+  A-G-E-G# **sous la fondamentale** : les degrés négatifs de `bass_deg` (l'encodage
+  240..254), le clavier re-racine la forme entière. Les accords du skank passent de la
+  lecture SLOOP (A F A G#) au vamp statique Am que la transcription montre.
+- **GUNMAN** — la marche G-G-F-G-F-F-F#, ses re-frappes et ses queues `cut` ; stabs en
+  Gm (la basse n'a que G, F et F#).
+- **TEMPO** — le steppers d'origine à 70 bpm (kick à chaque temps, caisse sur 2 et 4,
+  chapeaux en croches), la basse Am→F, et le **skank de la piste d'accords du MIDI**
+  (les stabs d'origine aux contretemps 2 6 10 14). La quatrième piste (Horns Melody) est
+  écartée : la machine n'a pas de mélodie, T1 reste la vôtre.
+- **PEANY PEANY** — le steppers au kick serré (les pickups de kick aux pas 5 et 13, le
+  rim du sidestick aux pas 6 et 14), la basse D-F-E-B (D dorien), stabs en Dm.
+
+Le skank des quatre riddims sans piste d'accords reste la ligne SLOOP Dub de la banque,
+posé sur l'harmonie que la basse des transcriptions implique (Gm, Am, C#m-B-A-B, Dm).
+Les tempos sont ceux des boucles filtrées de BaroqueDub (les mp3 `_[filtered]_XX.mp3`).
+Dans `riddims_grids.md`, une seconde lettre minuscule dans la ligne DRUM est le second
+hit du pas (`Ks` = kick + caisse), et `-N` un degré sous la racine de mesure.
 
 ## Comment un riddim joue dans MT-40X
 

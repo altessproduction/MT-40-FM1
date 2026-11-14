@@ -18,6 +18,19 @@ and the four-track load (`firmware/src/mt40.{c,h}`, hooks in `seq.c`, `menu_item
 `editor_menu.c`, `ui_draw.c`). Everything Felucca's licence says applies to this fork and
 to any firmware built from it: share it with its complete source, under GPL-3.0-only.
 
+### The BaroqueDub transcriptions (CC-Sampling-1.0)
+
+Five riddims of the bank (GUNMAN, HEAVENLESS, SLENG TENG, TEMPO, PEANY PEANY) are rebuilt
+from the MIDI REGGAE RIDDIMS of BaroqueDub — Jerome Di Pietro's netlabel transcriptions,
+<https://baroquedub.co.uk/archive/audio_riddims.html> — released under the Creative
+Commons Sampling license 1.0 (`CC-Sampling-1.0`, full text in `LICENSES/`), "not for sale
+or profit"; tempo.mid was donated by Jahpapu Kongo, the originals were sourced from the
+Jamaican Riddim Directory. The quantized rhythm-section events (the bass lines and the
+drum takes, no audio, no melody) live in `tools/baroquedub_riddims_data.py` with their
+attribution and are converted by `tools/midi_riddims.py`; this GPL-3.0-only tree carries
+the transcription data, not the files themselves, and stays non-commercial. All respect to
+the original artists and producers — one love.
+
 ## What is GPL-3.0-only
 
 Every file in this tree that carries an `SPDX-License-Identifier: GPL-3.0-only` header:

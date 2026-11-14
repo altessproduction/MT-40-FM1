@@ -67,16 +67,20 @@ def articulate_bar(events):
 
 def articulate(bass):
     """the 64 steps' bass events, bar by bar (each bar carries its own root, the degrees
-    are bar-relative)"""
+    are bar-relative, and so are the steps articulate_bar works on -- the v0.5 build
+    only ever plucked the first bar, the absolute steps never passed its BAR=16 checks;
+    v0.6 re-bases every bar, the whole bank gets the machine's re-strikes)"""
     out = []
     for b in range(STEPS // BAR):
-        bar = [e for e in bass if b * BAR <= e[0] < (b + 1) * BAR]
-        out.extend(articulate_bar(bar))
+        bar = [[e[0] - b * BAR, e[1], e[2]] for e in bass if b * BAR <= e[0] < (b + 1) * BAR]
+        out.extend([s + b * BAR, d, v] for s, d, v in articulate_bar(bar))
     return out
 
 
 def validate(r):
-    """the same rules the generator applies: no step twice, a CUT only over a held note"""
+    """the same rules the generator applies: no step twice, a CUT only over a held note.
+    The degrees: 0..16 over the bar's root, -15..-1 the semitones below it (the
+    transcription's sub-root walks, the .h encodes them, mt40.h)"""
     n = r["name"]
     seen = set()
     held = False
@@ -86,7 +90,7 @@ def validate(r):
             assert held, f"{n}: a cut with nothing held (step {st})"
             held = False
         else:
-            assert 0 <= deg <= 16, f"{n}: bass step {st}: degree {deg}"
+            assert -15 <= deg <= 16, f"{n}: bass step {st}: degree {deg}"
             assert st not in seen, f"{n}: step {st} twice (bass)"
             seen.add(st)
             held = True

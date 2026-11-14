@@ -1,5 +1,64 @@
 # MT-40X — changelog
 
+## v0.6 (mt40x_v1.8.2-0.6) — les riddims refaits d'après les enregistrements
+
+- **Cinq riddims reconstruits à partir des transcriptions MIDI de BaroqueDub**
+  (<https://baroquedub.co.uk/archive/audio_riddims.html>, les MIDI REGGAE RIDDIMS de
+  Jerome Di Pietro, CC-Sampling-1.0) : **GUNMAN, HEAVENLESS, SLENG TENG, TEMPO et PEANY
+  PEANY** retrouvent la basse et la batterie **des prises originales** —
+  `tools/baroquedub_riddims_data.py` porte les événements quantisés (source, licence),
+  `tools/midi_riddims.py` les convertit, `tools/verify_bank.py` vérifie champ à champ.
+  Ce qu'on entend :
+  - **SLENG TENG** (82 bpm, inchangé) : la ligne mythique revient **avec ses répétitions**
+    — C# D D D | C# D D D | C# D D D | G · F# ·, chaque D re-frappé, la queue coupée
+    (`cut`) là où la note s'arrête ; la batterie retrouve les unissons kick/caisse des
+    contretemps (les hits doubles de la grille).
+  - **HEAVENLESS** (77 bpm) : le martèlement A-A-A-A sur chaque double-croche et la
+    **marche sous la fondamentale** A-G-E-G#, écrite en degrés négatifs (l'encodage
+    240..254 de `bass_deg`, zéro octet de flash en plus) ; le clavier re-racine la forme
+    entière, marche comprise.
+  - **GUNMAN** (78 bpm) : la marche lourde G-G-F-G-F-F-F# des Roots Radics, ses re-frappes
+    et ses queues coupées.
+  - **TEMPO** (70 bpm, au lieu de 88) : le steppers d'origine (kick à chaque temps,
+    unissons kick+caisse sur 2 et 4), la basse Am→F (A A · · · · · E F E F · F · E F) et
+    **le skank de la piste d'accords du MIDI** (les stabs d'origine, contretemps 2 6 10
+    14) ; la quatrième piste du MIDI (Horns Melody) est écartée, la machine n'en a pas.
+  - **PEANY PEANY** (81 bpm, au lieu de 92) : le steppers au kick serré, les pickups de
+    kick et le rim de sidestick, la basse D-F-E-B (D dorien).
+  Le **skank** des quatre riddims sans piste d'accords reste la partie « session » de la
+  banque (les lignes SLOOP Dub), posé sur les accords que la basse des transcriptions
+  implique (Gm, Am, C#m-B-A-B, Dm). Les tempos sont ceux des boucles filtrées de
+  BaroqueDub (les mp3 étiquetés `_[filtered]_XX.XXX.mp3`).
+- **Les hits doubles de la grille batterie** : un pas de riddim peut porter **deux
+  lanes** (l'octet `drum_lane` : `240 + lane` un hit seul, nibble bas + nibble haut un
+  unisson) — le moteur DRUM les jouait déjà (`step_t.hit` est un masque), les données
+  ne le pouvaient pas. La fusion des pistes MIDI garde les deux hits structurels d'un
+  pas (kick puis caisse puis rim) quand leurs vélocités sont voisines (≤ 20), sinon le
+  plus fort seul — un chapeau masqué sous une grosse caisse meurt, comme dans la prise.
+- **Toute la banque re-frappée sur les quatre mesures** : correction d'un défaut de la
+  v0.5 — `mt40_bass.articulate` donnait des pas absolus à une logique qui compare à
+  `BAR=16`, **seule la première mesure recevait les re-frappes** ; les mesures 2 à 4
+  jouaient la basse tenue. C'est exactement ce qu'entendaient les joueurs (« il manque
+  des répétitions de note sur la basse »). Les vingt-trois riddims SLOOP Dub regagnent
+  leurs pincés partout (660 → 1 208 frappes), les cinq refaits portent la banque à
+  1 512 (932 en v0.5), règles inchangées (−22 à la double-croche, −34 à la croche,
+  planchers 72/64).
+- Les grilles imprimables (`riddims_grids.md`) affichent les nouveaux encodages : une
+  seconde lettre **minuscule** pour le second hit du pas (`Ks` = kick + caisse), `-N`
+  pour les degrés sous la racine (`-2-5-2-1` = la marche de Heavenless). Le format de
+  `riddims.json` passe à `mt40x-riddims-3` (hits doubles en 4e élément, degrés négatifs
+  en entiers signés).
+- Chaîne de vérification : `python3 tools/midi_riddims.py` (la migration v0.5 → v0.6,
+  y compris la ré-articulation des vingt-trois), `python3 tools/gen_mt40_riddims.py`,
+  `python3 tools/verify_bank.py` (0 échec, 0 dérive). `ui_test` passe sur les deux
+  builds (défaut et FELUCCA_CPU2=0) — le bloc MT-40X vérifie le Sleng Teng refait
+  (82 bpm, racine C#, la basse C#-D, le `cut` au pas 13, le F# au 14, le stab C#m) —,
+  `editor_test`, `drum_test`, `drumfuzz` (ASan/UBSan, deux passes) passent ; l'émulateur
+  wasm recompilé, smoke test AUDIO-PATH-OK.
+- Le paquet : `docs/firmware/mt40x_v1.8.2-0.6.fwsc` (610 286 B, identité `FM-1_23456`,
+  **l'image applicative ne grossit pas d'un octet** — les encodages vivent dans les
+  octets libres des tableaux existants), la release `build/release-0.6/`.
+
 ## v0.5 (mt40x_v1.8.2-0.5) — les trois parties de la machine, la basse qui re-frappe
 
 - **La mélodie quitte la banque** : le MT-40 joue basse et batterie, le skank est la voix
