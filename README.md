@@ -1,5 +1,7 @@
 # MT-40X — le Casio MT-40/41 sur le M-VAVE FM-1
 
+![MT-40X — the Casio MT-40 riddim machine](assets/mt40x-hub-card.webp)
+
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 ![identité](https://img.shields.io/badge/identit%C3%A9-FM--1__23456-E08A1E)
 ![version](https://img.shields.io/badge/version-v1.8.2--mt40x--0.3-2B1D12)
@@ -196,12 +198,13 @@ paquet `.fwsc` (ce que le hub lit), et la racine du dépôt via **`fmhub.json`**
   "kinds": ["groove"],
   "play": "https://altessproduction.github.io/MT-40-FM1/dub/",
   "cheat": "https://altessproduction.github.io/MT-40-FM1/cheat/",
-  "image": "assets/mt40x-hub-card.png",
+  "image": "assets/mt40x-hub-card.webp",
   "color": "#E08A1E"
 }
 ```
 
-- **`assets/mt40x-hub-card.png`** : la carte du hub (carré, 880×880).
+- **`assets/mt40x-hub-card.webp`** : la carte du hub — l'affiche rétro du MT-40X
+  (carré 1024×1024, 130 Ko, sous la limite des 300 Ko du hub).
 - **`docs/cheat/index.html`** : l'antisèche anglaise (clavier, 28 riddims, pistes, réglages)
   servie par Pages — le champ `cheat` du `fmhub.json`.
 - **`play`** : l'émulateur web (§5), servie par Pages (branche `main`, dossier `/docs`).
