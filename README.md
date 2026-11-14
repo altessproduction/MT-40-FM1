@@ -83,13 +83,29 @@ pincées du Sleng Teng) ; c'est la notation des grilles imprimables `riddims_gri
 
 ## 3. Emploi — pas à pas
 
+**D'abord, les gestes du MENU** — il ne s'ouvre pas tout seul, c'est le même chemin chaque
+fois (les libellés sont ceux du panneau) :
+
+| Geste | Effet |
+| --- | --- |
+| **HOME maintenu** (~ 1 s) | ouvre le MENU — un petit appui sur HOME le referme |
+| **ALGORITHM** (la molette, en haut à droite) | change d'**onglet** : DISPLAY → CONTROL → **AUDIO** → MIDI → SYSTEM — la barre d'onglets en haut de l'écran suit la molette |
+| **PRESETS** (la molette à côté) | monte / descend **ligne par ligne** dans l'onglet |
+| **KNOB 1–4** (les 4 petites molettes) ou **OCT+ / OCT−** | change la **valeur** de la ligne choisie (OCT+ : valeur suivante, OCT− : valeur précédente) |
+
+Le chemin MT-40X en clair : **HOME maintenu → ALGORITHM jusqu'à l'onglet AUDIO → PRESETS
+jusqu'à la ligne MT-40X → OCT+ pour ON**. La ligne **RIDDIM** est juste en dessous.
+
+Puis, pas à pas :
+
 1. **Sauvegardez** vos projets, presets et échantillons (SAVE &gt; PROJECT, ou l'éditeur
    web) — la règle avant toute manipulation de firmware.
 2. **Flashez** `mt40x_v1.8.2-0.3.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
    démarrage affiche « MT-40X v1.8.2-mt40x ».
-3. **MENU &gt; AUDIO &gt; RIDDIM** : tournez le bouton — le riddim se charge (les quatre
-   pistes, le tempo). Le nom s'affiche comme valeur de la ligne.
-4. **MENU &gt; AUDIO &gt; MT-40X : ON** — les touches deviennent le clavier de basse.
+3. **MENU &gt; AUDIO &gt; RIDDIM** : sur la ligne RIDDIM, tournez **OCT+** — chaque cran
+   charge le riddim (les quatre pistes, le tempo). Le nom s'affiche comme valeur de la ligne.
+4. **MENU &gt; AUDIO &gt; MT-40X : ON** — remontez d'une ligne (PRESETS), OCT+ encore :
+   les touches deviennent le clavier de basse.
 5. **PLAY** — ou pressez une première touche : synchro start.
 6. **Transposez** : une touche = majeur, +1 = mineur, +2 = septième, même touche = majeur.
 

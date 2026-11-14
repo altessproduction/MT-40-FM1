@@ -43,6 +43,11 @@ GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le f
 
 ## Emploi
 
+**Ouvrir le MENU** : HOME maintenu (~ 1 s). Ensuite : **ALGORITHM** change d'onglet
+(DISPLAY → CONTROL → AUDIO → MIDI → SYSTEM), **PRESETS** descend ligne par ligne,
+**KNOB 1–4** ou **OCT+ / OCT−** change la valeur de la ligne choisie, HOME referme.
+Le chemin : HOME maintenu → ALGORITHM jusqu'à AUDIO → PRESETS jusqu'à MT-40X → OCT+ = ON.
+
 **MENU > AUDIO** a deux lignes de plus que Felucca :
 
 - **RIDDIM** : 28 valeurs — un tour de bouton **charge le riddim aussitôt** (les quatre
