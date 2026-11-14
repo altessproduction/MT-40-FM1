@@ -1,5 +1,28 @@
 # MT-40X — changelog
 
+## v0.3 (mt40x_v1.8.2-0.3) — l'identité du hub et le dossier de soumission
+
+- **L'identité du paquet devient `FM-1_23456`** — le numéro de MT-40X au Firmware Hub
+  (<https://thefirmwarehub.com/>), un numéro `FM-1_` n'appartient qu'à un firmware. Elle vit
+  dans la chaîne `FELUCCA_ID` du firmware (ABOUT, la réponse du protocole OTA :
+  `ota-FM-1_23456`) et dans le marqueur du `.fwsc` (ce que le hub lit). Le loader embarqué
+  reprend l'identité du paquet (loader.c la reçoit du build, `ota-` préfixé) ; les builds de
+  développement gardent FM-1_900.
+- **Le dossier hub à la racine** : `fmhub.json` (what anglais ≤ 300 caractères, kinds
+  groove, play l'émulateur, cheat l'antisèche, la carte, la couleur), la carte
+  `assets/mt40x-hub-card.png` (carré 880×880, 49 Ko) et l'antisèche anglaise
+  `docs/cheat/index.html` (clavier, 28 riddims et tempos, pistes, réglages 33/34) servie
+  par Pages sur `/cheat/`.
+- **Le README.md de la racine** refait : tout le fonctionnement (l'histoire du MT-40 et du
+  Sleng Teng, le clavier de basse, les 28 riddims et leurs tempos, l'emploi, l'émulateur,
+  l'installation, le hub, la compilation, la calibration, les licences).
+- Le paquet : `docs/firmware/mt40x_v1.8.2-0.3.fwsc` (610 286 B), la release
+  `build/release-0.3/` (paquet, `.bin` applicatif, SHA256SUMS, licences, attribution).
+  Le `.fwsc` de v0.2 reste flashable — l'identité ne change que le marquage et ABOUT.
+- L'émulateur recompilé (le wasm ressort identique octet pour octet : la chaîne d'identité
+  n'y est pas référencée ; `docs/dub/` synchronisé) — le smoke test finit sur
+  `AUDIO-PATH-OK`.
+
 ## v0.2.1 — l'émulateur web
 
 - **Le firmware MT-40X tourne dans le navigateur** : <https://altessproduction.github.io/MT-40-FM1/dub/>

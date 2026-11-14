@@ -231,7 +231,7 @@ static void fm1_enter_uboot(void) {}
 #define FELUCCA_VERSION "v1.8.2-mt40x"
 #endif
 #ifndef FELUCCA_ID
-#define FELUCCA_ID "FM-1_900"
+#define FELUCCA_ID "FM-1_23456"   /* MT-40X's own identity (fmhub.json, the hub); stable across releases */
 #endif
 
 #include "felucca_tables.h"      /* generated (tools/gen_tables.py et al.) */

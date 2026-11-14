@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MT-40X — cheat sheet (M-VAVE FM-1)</title>
+<style>
+  :root { --ink:#2B1D12; --amber:#E08A1E; --paper:#F4ECDC; --card:#FFFDF6; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:2rem; background:var(--paper); color:var(--ink);
+         font:16px/1.55 "Segoe UI", "Helvetica Neue", Arial, sans-serif; }
+  main { max-width:960px; margin:0 auto; }
+  h1 { font-size:2.1rem; margin:0; letter-spacing:.5px; }
+  h1 span { color:var(--amber); }
+  h1 .pill { color:var(--paper); }
+  .tag { margin:.2rem 0 1.4rem; color:#7A5B36; }
+  h2 { font-size:1.15rem; border-bottom:3px solid var(--amber); padding-bottom:.25rem; margin-top:2rem; }
+  table { border-collapse:collapse; width:100%; background:var(--card); margin:.6rem 0; }
+  th, td { border:1px solid #D9C9A8; padding:.32rem .55rem; text-align:left; vertical-align:top; }
+  th { background:#EFE3C8; }
+  td.n { text-align:right; color:#7A5B36; white-space:nowrap; }
+  .kbd { display:inline-block; border:1.5px solid var(--ink); border-radius:5px; padding:0 .4rem;
+         background:#fff; font-weight:600; box-shadow:0 2px 0 var(--ink); }
+  .pill { display:inline-block; background:var(--ink); color:var(--paper); border-radius:1rem;
+          padding:.05rem .7rem; font-size:.85rem; margin-left:.5rem; }
+  .note { background:var(--card); border-left:5px solid var(--amber); padding:.6rem .9rem; margin:.7rem 0; }
+  a { color:#B96F12; }
+  footer { margin-top:2.4rem; color:#7A5B36; font-size:.85rem; border-top:1px solid #D9C9A8; padding-top:.8rem; }
+  @media print { body { background:#fff; padding:0; } h2 { break-after:avoid; } table { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<main>
+<h1>MT-40X <span>cheat sheet</span><span class="pill">FM-1_23456</span></h1>
+<p class="tag">The Casio MT-40/41's auto-accompaniment on the M-VAVE FM-1 — firmware v1.8.2-mt40x,
+package <code>mt40x_v1.8.2-0.3.fwsc</code>, a fork of Felucca 1.8.2 with the 28-riddim bank of SLOOP Dub 1.6.</p>
+
+<h2>Quick start</h2>
+<ol>
+  <li><strong>MENU &gt; AUDIO &gt; RIDDIM</strong> — one knob turn loads a riddim at once: its four tracks
+      (T1 melody, T2 skank chords, T3 bass, T4 drums) and its tempo (66…172 BPM).</li>
+  <li><strong>MENU &gt; AUDIO &gt; MT-40X = ON</strong> — the keys become the MT-40's bass keyboard.</li>
+  <li><strong>PLAY</strong> — or just press a key while stopped: <em>synchro start</em>, the first chord starts the transport.</li>
+  <li><strong>Press keys</strong> to re-root the whole pattern live. Nothing pressed: the riddim plays exactly as written.</li>
+</ol>
+
+<h2>The bass keyboard</h2>
+<table>
+  <tr><th>Key</th><th>What it does</th></tr>
+  <tr><td>Any key (the 27 keys, MIDI 53…79 / F3…G5)</td><td>Root of the whole accompaniment, <strong>major</strong>. The key itself sounds nothing — it re-voices the four tracks (192 steps). Its pitch class is folded into the bass register (MIDI 28…50).</td></tr>
+  <tr><td>The key a semitone <em>above</em> the held root</td><td><strong>minor</strong> of that root</td></tr>
+  <tr><td>Two semitones <em>above</em> the held root</td><td><strong>dominant 7th</strong> of that root (the bar's last fifth flattens — the turnaround)</td></tr>
+  <tr><td>The same key pressed again</td><td>Back to <strong>major</strong> of that key (every root stays reachable)</td></tr>
+</table>
+<div class="note">Drums never transpose. Bass, skank chords and melody follow the keyboard.
+MT-40X armed, the keys are no synth keys — play over it with MT-40X OFF, or from MIDI.</div>
+
+<h2>MENU &gt; AUDIO (the two MT-40X rows)</h2>
+<table>
+  <tr><th>Row</th><th>Values</th><th>Web editor id</th></tr>
+  <tr><td>MT-40X</td><td>OFF / ON — ON: the keys are the bass keyboard</td><td class="n">33</td></tr>
+  <tr><td>RIDDIM</td><td>1…28 — one turn loads the riddim (name shown as the row's value)</td><td class="n">34</td></tr>
+</table>
+
+<h2>What a riddim loads</h2>
+<table>
+  <tr><th>Track</th><th>Content</th><th>Settings set on load</th></tr>
+  <tr><td>T1</td><td>the riddim's melody</td><td>GATE 127 (rests hold the note)</td></tr>
+  <tr><td>T2</td><td>the skank: the bar's chord (root, third, fifth, + seventh)</td><td>GATE 40, VOICE POLY</td></tr>
+  <tr><td>T3</td><td>the bass: the groove over the bar's root</td><td>GATE 127, VOICE MONO</td></tr>
+  <tr><td>T4</td><td>the drums (one hit per step at most, original velocities)</td><td>LEN 64, DIV 1/16</td></tr>
+</table>
+<p>Patterns are 4 bars of 16 sixteenths (64 steps); the fill lives inside bar 4, as in SLOOP Dub
+(<span class="kbd">GLO</span>+<span class="kbd">E4</span> FILL conditions stay available on steps you mark yourself).
+A rest <em>holds</em> (TIE); a <code>cut</code> step ends the held note (the Sleng Teng's plucked tails).</p>
+
+<h2>The 28 riddims (SLOOP Dub 1.6 bank, roots as written)</h2>
+<table>
+<tr><th>#</th><th>Riddim</th><th class="n">BPM</th><th>Bar roots</th><th>Family / reference</th></tr>
+<tr><td class="n">1</td><td>ONE DROP</td><td class="n">72</td><td>A1 A1 D2 E2</td><td>the roots one drop</td></tr>
+<tr><td class="n">2</td><td>STEPPERS</td><td class="n">76</td><td>A2 G2 A2 G2</td><td>four-on-the-kick steppers</td></tr>
+<tr><td class="n">3</td><td>ROCKERS</td><td class="n">80</td><td>D2 D2 A1 A1</td><td>the Roots Radics rockers</td></tr>
+<tr><td class="n">4</td><td>DUBWALK</td><td class="n">70</td><td>A1 F2 G2 E2</td><td>slow dub, walking bass</td></tr>
+<tr><td class="n">5</td><td>MEDITATE</td><td class="n">66</td><td>A2 G2 F2 E2</td><td>sparse meditation rock</td></tr>
+<tr><td class="n">6</td><td>DUB CUT</td><td class="n">74</td><td>A1 A1 F2 F2</td><td>holey dub, the cut bass</td></tr>
+<tr><td class="n">7</td><td>ZION</td><td class="n">68</td><td>D2 A1 D2 E2</td><td>rising roots</td></tr>
+<tr><td class="n">8</td><td>SKA</td><td class="n">88</td><td>A2 A2 F2 G2</td><td>the ska walk</td></tr>
+<tr><td class="n">9</td><td>HEAVENLESS</td><td class="n">80</td><td>A1 F2 A1 G2</td><td>Vin Gordon, Studio One 1968</td></tr>
+<tr><td class="n">10</td><td>TONIGHT</td><td class="n">84</td><td>E2 A2 G2 E2</td><td>Keith &amp; Tex 1967, the rolling bass</td></tr>
+<tr><td class="n">11</td><td>GET IN GROOVE</td><td class="n">88</td><td>F2 A2 G2 F2</td><td>Studio One 1968 (Up Park Camp)</td></tr>
+<tr><td class="n">12</td><td>HOT MILK</td><td class="n">92</td><td>C2 F2 G2 C2</td><td>Jackie Mittoo 1968</td></tr>
+<tr><td class="n">13</td><td>ANSWER</td><td class="n">82</td><td>A1 A1 A1 A1</td><td>the one-chord, Slim Smith 1967</td></tr>
+<tr><td class="n">14</td><td>PROMISED LAND</td><td class="n">78</td><td>F2 A#2 C2 G2</td><td>Dennis Brown 1981 (with Aswad)</td></tr>
+<tr><td class="n">15</td><td>GUNMAN</td><td class="n">78</td><td>C2 C2 G#1 A#1</td><td>Michael Prophet 1980, the Roots Radics' heavy march</td></tr>
+<tr><td class="n">16</td><td>HERE I COME</td><td class="n">95</td><td>A1 C2 D2 E2</td><td>Barrington Levy 1985, the octave pump</td></tr>
+<tr><td class="n">17</td><td>SLENG TENG</td><td class="n">82</td><td>C#2 ×4</td><td>the MT-40's Rock — Wayne Smith, King Jammy's 1985</td></tr>
+<tr><td class="n">18</td><td>TEMPO</td><td class="n">88</td><td>A1 C2 D2 A1</td><td>Anthony Red Rose 1985, Firehouse</td></tr>
+<tr><td class="n">19</td><td>PEANY PEANY</td><td class="n">92</td><td>A1 C2 A1 E2</td><td>the digital bounce (Fade Away) 1987</td></tr>
+<tr><td class="n">20</td><td>DANCEHALL</td><td class="n">95</td><td>A1 D2 A1 G2</td><td>the 3+3+2 clap</td></tr>
+<tr><td class="n">21</td><td>DEMBOW</td><td class="n">100</td><td>A1 A1 E2 E2</td><td>boom-ch-boom-chick</td></tr>
+<tr><td class="n">22</td><td>JUNGLE</td><td class="n">172</td><td>A1 A1 C2 G1</td><td>jungle subs</td></tr>
+<tr><td class="n">23</td><td>DUBSTEP</td><td class="n">140</td><td>A1 A1 G1 G1</td><td>half-time, the wobble</td></tr>
+<tr><td class="n">24</td><td>MT40 POPS</td><td class="n">96</td><td>E2 G2 A2 E2</td><td>the machine's Pops</td></tr>
+<tr><td class="n">25</td><td>MT40 SLOWRK</td><td class="n">66</td><td>A1 A1 E2 D2</td><td>the machine's Slow Rock</td></tr>
+<tr><td class="n">26</td><td>MT40 SWING</td><td class="n">84</td><td>A2 F2 G2 E2</td><td>the machine's Swing</td></tr>
+<tr><td class="n">27</td><td>MT40 WALTZ</td><td class="n">90</td><td>A2 F#2 D2 E2</td><td>the machine's Waltz (laid on 4/4)</td></tr>
+<tr><td class="n">28</td><td>MT40 SAMBA</td><td class="n">100</td><td>A2 A2 G2 G2</td><td>the machine's Samba (the agogo on the rim)</td></tr>
+</table>
+<div class="note"><strong>SLENG TENG</strong> is the verified transcription (Noel Davey's own tab, the Ableton roll,
+82 BPM): the root on the beat, three sixteenths a semitone above, the tail a fifth above, cut short.
+The MT-40's <em>Rock</em> preset is this rhythm — the riddim that started digital dancehall in 1985.</div>
+
+<h2>Known limits</h2>
+<ul>
+  <li>The MT-40X state (loaded riddim, current chord) is not saved in the project — reload after power-off
+      (the tracks themselves stay if you save the project).</li>
+  <li>The skank keeps the bank's register (57…68); chords follow the pressed root as a pitch class, not a register.</li>
+  <li>Patterns are 4 bars of 4/4; the MT-40's Waltz (3/4) is laid on that grid, as in SLOOP Dub.</li>
+  <li>The MAJ / DOM7 spelling of the grooves is derived mechanically — <a href="https://github.com/altessproduction/MT-40-FM1/blob/main/docs/mt40x/CALIBRATION.md">CALIBRATION.md</a>
+      is where you check it against a real MT-40.</li>
+</ul>
+
+<h2>Links</h2>
+<ul>
+  <li>Play in the browser (the real firmware as WebAssembly):
+      <a href="https://altessproduction.github.io/MT-40-FM1/dub/">altessproduction.github.io/MT-40-FM1/dub/</a></li>
+  <li>Source, docs and releases: <a href="https://github.com/altessproduction/MT-40-FM1">github.com/altessproduction/MT-40-FM1</a></li>
+  <li>Full riddim guide (printable grids): <code>docs/mt40x/GUIDE-RIDDIMS.md</code> and <code>riddims_grids.md</code> (in the repository)</li>
+</ul>
+
+<footer>MT-40X, GPL-3.0-only — Felucca by Leo Kuroshita / Hügelton Instruments; the riddim bank by
+altessproduction's SLOOP Dub 1.6. Casio and MT-40 are trademarks of Casio Computer Co., Ltd.;
+MT-40X is an independent homage, not affiliated with or endorsed by Casio.</footer>
+</main>
+</body>
+</html>
