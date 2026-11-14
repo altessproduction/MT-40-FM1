@@ -8,6 +8,11 @@
 > RIDDIM. Documentation in French under `docs/mt40x/` (`LISEZMOI.md` to start; the riddim
 > bank lives in `riddims.json`, its printable grids in `riddims_grids.md`, its generator in
 > `tools/gen_mt40_riddims.py`). Licensing: `LICENSING.md`, section "The MT-40X fork".
+>
+> **Play it in the browser:** the real firmware compiled to WebAssembly —
+> [the MT-40X web emulator](https://altessproduction.github.io/MT-40-FM1/dub/)
+> (sources in `web-emu/`, the Pages copy in `docs/dub/`, the build and the smoke test
+> in `web-emu/README.md`).
 
 Felucca is open-source custom synthesizer firmware for the **M-VAVE FM-1**.
 

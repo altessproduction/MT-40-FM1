@@ -1,0 +1,9 @@
+{
+    "name": "MT-40X — émulateur FM-1",
+    "short_name": "MT-40X",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#101114",
+    "theme_color": "#101114",
+    "description": "Le vrai firmware MT-40X (Felucca + la banque SLOOP Dub 1.6) du M-VAVE FM-1, émulé dans le navigateur."
+}
