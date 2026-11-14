@@ -1678,10 +1678,11 @@ static int test_menu_tabs(void)
             }
     }
     ui_prefs = 0;
-    bad += check("MENU tabs: DISPLAY CONTROL AUDIO MIDI SYSTEM (8 8 6 8 8 rows: 1.6.1 2ND CORE, a FELUCCA_CPU2=0 build SYSTEM 7; 1.8: CLEAR ALL; 1.5.5: SELECT, T1..T4 CHANNEL, AUTO SELECT, SCREEN WAKE), 1..8 each in a run, fit the page; tab gaps "
+    bad += check("MENU tabs: DISPLAY CONTROL AUDIO MIDI SYSTEM (8 8 8 8 8 rows: 1.6.1 2ND CORE, a FELUCCA_CPU2=0 build SYSTEM 7; 1.8: CLEAR ALL; 1.5.5: SELECT, T1..T4 CHANNEL, AUTO SELECT, SCREEN WAKE; MT-40X: MT-40X RIDDIM in AUDIO), 1..8 each in a run, fit the page; tab gaps "
                  "constant (S, LARGE)",
                  ok && MTAB_COUNT == 5u && str_eq(MTAB_NAME[0], "DISPLAY") && str_eq(MTAB_NAME[MTAB_MIDI], "MIDI") &&
-                 mtab_rows(MTAB_DISPLAY) == 8u && MI_TAB[MI_HOME] == MTAB_DISPLAY && mtab_rows(MTAB_CONTROL) == 8u && MI_TAB[MI_SELECT] == MTAB_CONTROL && mtab_rows(MTAB_AUDIO) == 6u &&
+                 mtab_rows(MTAB_DISPLAY) == 8u && MI_TAB[MI_HOME] == MTAB_DISPLAY && mtab_rows(MTAB_CONTROL) == 8u && MI_TAB[MI_SELECT] == MTAB_CONTROL && mtab_rows(MTAB_AUDIO) == 8u &&
+                 MI_TAB[MI_MT40X] == MTAB_AUDIO && MI_TAB[MI_RIDDIM] == MTAB_AUDIO && MI_RIDDIM == MI_MT40X + 1u && menu_n(MI_RIDDIM) == MT40_RIDDIM_N && MT40_RIDDIM_N == 28u &&
                  mtab_rows(MTAB_MIDI) == 8u && MI_TAB[MI_MFOLLOW] == MTAB_MIDI && MI_TAB[MI_SCRWAKE] == MTAB_MIDI && MI_SCRWAKE + 1u == MI_LCLEAR && MI_TAB[MI_LCLEAR] == MTAB_MIDI && MI_TAB[MI_TCH4] == MTAB_MIDI && mtab_rows(MTAB_SYSTEM) == 7u + FELUCCA_CPU2 && MI_TAB[MI_CLRALL] == MTAB_SYSTEM && !menu_valued(MI_CLRALL) &&
 #if FELUCCA_CPU2
                  MI_TAB[MI_CPU2] == MTAB_SYSTEM &&
@@ -1891,6 +1892,64 @@ static int test_menu_tabs(void)
 /* 1.2: MENU > AUDIO > TUNE and MENU > MIDI > MIDI IN edit the project's G_TUNE and G_ROUTE (up to 1.1.5 GLO > GLOBAL K4
  * and GLO > SYSTEM K3): the same values, stored with the project as before (a PROJECT save / load, the autosave), never
  * in the settings record */
+/* the MT-40X fork: a riddim into the four tracks (drums, bass, skank chords, melody), the
+ * bass keyboard's chord (the key, +1 MIN, +2 DOM7, the same key again MAJ), the menu rows
+ * and the SYNCHRO START */
+static int test_mt40(void)
+{
+    int bad = 0;
+    track_t *mel = &trk[0], *sk = &trk[1], *bs = &trk[2], *dr = &trk[3];
+    ui_power_on();
+    mt40_set(1u);
+    mt40_rid = -1; mt40_root = -1; mt40_qual = MT40_Q_MIN;   /* (the menu sweep above may have loaded one) */
+    bad += check("MT-40X: armed, nothing loaded yet", mt40_on == 1u && mt40_rid == -1 && mt40_root == -1);
+    mt40_load(2u);                                     /* ROCKERS: roots 38 38 33 33, its groove's +3 at 14 */
+    bad += check("MT-40X: the load puts the riddim, its tempo and the 64 steps of 1/16 in",
+                 mt40_rid == 2 && song.g[G_BPM] == 80 && dr->p[P_SLEN] == 64 && dr->p[P_SDIV] == 2 &&
+                 bs->p[P_SLEN] == 64 && bs->p[P_SDIV] == 2);
+    bad += check("MT-40X: the drums into T4, their velocities (the DRUM engine, its engine kept)",
+                 dr->step[0].hit == 1u && dr->step[0].time == ST_NOTE && dr->step[0].vel == 122 &&
+                 dr->step[4].hit == 2u && dr->step[1].hit == 0u && dr->step[0].n == 0);
+    bad += check("MT-40X: the bass into T3 as written, its rests TIEs, plucky gate, MONO",
+                 bs->step[0].time == ST_NOTE && bs->step[0].note[0] == 38 && bs->step[0].n == 1 &&
+                 bs->step[14].note[0] == 41 && bs->step[1].time == ST_TIE &&
+                 bs->p[P_SGATE] == 127 && bs->p[P_VOICE] == V_MONO);
+    bad += check("MT-40X: the skank into T2 as the bar's chord (57 + 38 % 12, MIN, POLY) with its velocity",
+                 sk->step[2].n == 3 && sk->step[2].note[0] == 59 && sk->step[2].note[1] == 62 &&
+                 sk->step[2].note[2] == 66 && sk->step[2].vel == 112 && sk->p[P_VOICE] == V_POLY);
+    bad += check("MT-40X: the melody into T1 as written, the transport still",
+                 mel->step[8].note[0] == 57 && mel->step[8].vel == 92 && song.playing == 0);
+    bad += check("MT-40X: a key is the chord (MAJ, the SYNCHRO START asked while stopped)",
+                 mt40_key_press(7u) == 1u && transport_req == 1u && mt40_root == 48 && mt40_qual == MT40_Q_MAJ);
+    transport_req = 0;
+    bad += check("MT-40X: the whole accompaniment re-voiced on the press, the drums still",
+                 bs->step[0].note[0] == 48 && bs->step[14].note[0] == 52 &&
+                 sk->step[2].note[0] == 57 && sk->step[2].note[1] == 61 && sk->step[2].note[2] == 64 &&
+                 mel->step[8].note[0] == 67 && dr->step[0].hit == 1u);
+    bad += check("MT-40X: the key above the root plays it MIN",
+                 mt40_key_press(8u) == 1u && mt40_qual == MT40_Q_MIN && mt40_root == 48 &&
+                 bs->step[14].note[0] == 51 && sk->step[2].note[1] == 60);
+    bad += check("MT-40X: the same key again takes its own MAJ back",
+                 mt40_key_press(8u) == 1u && mt40_qual == MT40_Q_MAJ && mt40_root == 49 &&
+                 bs->step[0].note[0] == 49 && bs->step[14].note[0] == 53);
+    bad += check("MT-40X: two keys above the root plays it DOM7 (the bar's last fifth flat, the tetrad)",
+                 mt40_key_press(10u) == 1u && mt40_qual == MT40_Q_DOM7 && mt40_root == 49 &&
+                 bs->step[12].note[0] == 59 && bs->step[14].note[0] == 53 &&
+                 sk->step[2].note[0] == 58 && sk->step[2].note[3] == 68);
+    mt40_load(16u);                                    /* SLENG TENG: the verified transcription, 82 bpm */
+    bad += check("MT-40X: SLENG TENG loads (the MENU row's name, the roots C#), the keyboard forgotten",
+                 mt40_rid == 16 && song.g[G_BPM] == 82 && mt40_root == -1 &&
+                 str_eq(menu_vname(MI_RIDDIM, 16), "SLENG TENG") && menu_get(MI_RIDDIM) == 16u &&
+                 MT40_RIDDIMS[16]->bpm == 82u && MT40_RIDDIMS[16]->roots[0] == 37u);
+    bad += check("MT-40X: the Sleng Teng's stutter (the semitone above), its cut, its tail a fifth over, the skank's A",
+                 bs->step[0].note[0] == 37 && bs->step[1].note[0] == 38 &&
+                 bs->step[13].time == ST_REST && bs->step[14].note[0] == 42 &&
+                 sk->step[2].note[0] == 58 && sk->step[2].note[1] == 61 && sk->step[2].note[2] == 65);
+    menu_put(MI_MT40X, 0u);
+    bad += check("MT-40X: the MENU row disarms it", mt40_on == 0u && str_eq(menu_vname(MI_MT40X, 1), "ON"));
+    return bad;
+}
+
 static int test_menu_project_rows(void)
 {
     int bad = 0, ok;
@@ -8049,7 +8108,9 @@ static int test_click_menu(void)
     turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_COUNTIN;
     turn(EN_K4, 1); ok &= cin_bars == 1u;
     turn(EN_K4, 1); ok &= cin_bars == 2u;
-    turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_TUNE;     /* (1.2: TUNE, AUDIO's last) */
+    turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_TUNE;     /* (1.2: TUNE, then the MT-40X fork's rows) */
+    turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_MT40X;    /* (the MT-40X fork: OFF / ON) */
+    turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_RIDDIM;   /* (the bank, 1..28) */
     turn(EN_PRESET, 1); ok &= ui.menu_sel == MI_LOWCUT;   /* (wraps within AUDIO) */
     press(B_HOME);
     ok &= !ui.menu;
@@ -10055,6 +10116,7 @@ int main(void)
     bad += test_categories();
     bad += test_display_preferences();
     bad += test_menu_tabs();
+    bad += test_mt40();
     bad += test_menu_project_rows();
     bad += test_information();
     bad += test_chain();

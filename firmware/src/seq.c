@@ -834,6 +834,12 @@ static void keyboard_block(void)
                 kb_note[k] = KB_SILENT;
                 continue;
             }
+            if (!lay && !fx && !song.grid && mt40_key_press(k)) {   /* MT-40X armed: the key is the
+                                                                     * bass keyboard's chord, it sounds
+                                                                     * nothing (mt40.c) */
+                kb_note[k] = KB_SILENT;
+                continue;
+            }
             if (lay) {                            /* a layer's button held (or locked): the key is the layer's */
                 kb_note[k] = KB_SILENT;           /* (ui_layer.c), with FX an effect (perform.c) */
                 kb_layer |= 1u << k;

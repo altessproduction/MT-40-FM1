@@ -48,7 +48,7 @@
 #define FM1_CRASH_CTX_N 1u         /* chip/fm1_irq.h: the registers of the last crash only (80 B of .noinit; four would
                                     * not fit beside the project slots) */
 #ifndef FELUCCA_VERSION
-#define FELUCCA_VERSION "v1.8.2" /* shown in the menu, the console and the editor; build.py --release X.Y */
+#define FELUCCA_VERSION "v1.8.2-mt40x" /* the MT-40X fork; shown in the menu, the console and the editor */
 #endif
 #if FELUCCA_OTA && !FELUCCA_FLASH
 #error "FELUCCA_OTA needs FELUCCA_FLASH"
@@ -83,6 +83,7 @@ static __attribute__((noinline)) int c1_wait(void) { return fm1_cpu1_wait(); }  
 
 /* ----------------------------------------------------------- sound --- */
 #include "core.h"
+#include "mt40.h"               /* the MT-40X fork: the MT-40 auto-accompaniment (mt40.c, mt40_riddims.h) */
 #include "engines.c"             /* dsp.c, the eng_*.c files, the factory patterns */
 #include "params.c"
 #include "mod.c"               /* the modulation matrix, used by voice.c and fx.c */
@@ -97,6 +98,8 @@ static __attribute__((noinline)) int c1_wait(void) { return fm1_cpu1_wait(); }  
 #endif
 #include "song_chain.c"
 #include "seq.c"
+#include "mt40.c"               /* the MT-40X fork: the riddim bank, the bass keyboard (after seq.c: it
+                                 * starts the transport; before menu_items.c: its rows load it) */
 #include "audio.c"
 
 /* -------------------------------------------------------------- UI --- */

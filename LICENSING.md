@@ -7,6 +7,17 @@ texts are in `LICENSES/`.
 
 Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments
 
+## The MT-40X fork
+
+This tree is MT-40X, a fork of Felucca v1.8.2 that adds the Casio MT-40 / 41's
+auto-accompaniment to the FM-1: the riddim bank (the twenty-eight riddims of SLOOP Dub 1.6
+by altessproduction, GPL-3.0-only — `tools/sloop_riddims_data.py`, converted by
+`tools/gen_mt40_riddims.py` into `firmware/src/mt40_riddims.h`), the MT-40 bass keyboard on
+the keys, the AUDIO menu rows MT-40X and RIDDIM (editor ids 33 and 34), the SYNCHRO START
+and the four-track load (`firmware/src/mt40.{c,h}`, hooks in `seq.c`, `menu_items.c`,
+`editor_menu.c`, `ui_draw.c`). Everything Felucca's licence says applies to this fork and
+to any firmware built from it: share it with its complete source, under GPL-3.0-only.
+
 ## What is GPL-3.0-only
 
 Every file in this tree that carries an `SPDX-License-Identifier: GPL-3.0-only` header:
@@ -75,6 +86,7 @@ All by Hügelton Instruments (Leo Kuroshita), in this tree:
 | klattsch by Tony Gies (<https://github.com/tgies/klattsch>): design reference for the VOICE engine; no code copied. Formant data from Klatt (1980) / Hillenbrand et al. (1995) | MIT (klattsch) | credit only |
 | The second core: Melodee's by keremimo (<https://github.com/keremimo/melodee>), in felucca-bsp under MPL-2.0 by agreement, with charlesvestal's start and API (X0X, <https://github.com/charlesvestal/fm1-x0x>) | MPL-2.0 | `firmware/bsp/chip/fm1_cpu1.{h,S}`, `firmware/bsp/NOTICE` |
 | The parts' split across the two cores, its measurements and hardening after Jangada by zednaked (<https://github.com/zednaked/jangada>); credited in its files | GPL-3.0 | `firmware/src/fx.c`, `tests/c1_host.h`, `tests/dualcore_test.c` |
+| The MT-40X fork's riddim bank: the twenty-eight riddims of SLOOP Dub 1.6 by altessproduction (<https://github.com/altessproduction/sloop-dub-fm1>, tag v1.6), converted into `firmware/src/mt40_riddims.h` by `tools/gen_mt40_riddims.py` from the verbatim copy of their generator in `tools/sloop_riddims_data.py` | GPL-3.0-only | `tools/sloop_riddims_data.py`, `firmware/src/mt40_riddims.h`, `LICENSES/GPL-3.0-only-SLOOP-Dub.txt` |
 | JieLi AC79 SDK by JieLi Technology: three of its files go into every `.fwsc` package (below); none are in this tree | Apache-2.0 | `LICENSES/Apache-2.0.txt` |
 
 On the device, HOME held > ABOUT opens the information screen; turning PRESETS scrolls on into

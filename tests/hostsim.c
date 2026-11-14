@@ -39,7 +39,9 @@ static void fm1_delay_ms(uint32_t ms) { (void)ms; }
 #include "../firmware/bsp/chip/usb.c"
 #include "../firmware/src/midi_uart.c"                /* TRS MIDI IN: its parser (um_byte) feeds midi_in_q */
 #include "../firmware/src/song_chain.c"
+#include "../firmware/src/mt40.h"                     /* the MT-40X fork (mt40.c after seq.c) */
 #include "../firmware/src/seq.c"
+#include "../firmware/src/mt40.c"
 #define inst (trk[0])                   /* the single-part renders below: part 1 */
 
 static void wav_hdr(FILE *f, uint32_t frames)

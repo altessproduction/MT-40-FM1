@@ -2,6 +2,13 @@
 
 [![License: GPL-3.0-only](https://img.shields.io/badge/license-GPL--3.0--only-blue.svg)](LICENSE)
 
+> **This tree is MT-40X v0.2** — a fork of Felucca v1.8.2 that adds the Casio MT-40 / 41's
+> auto-accompaniment to the FM-1: the 28-riddim bank of SLOOP Dub 1.6 (altessproduction),
+> the MT-40 bass keyboard on the keys, the SYNCHRO START, the MENU > AUDIO rows MT-40X and
+> RIDDIM. Documentation in French under `docs/mt40x/` (`LISEZMOI.md` to start; the riddim
+> bank lives in `riddims.json`, its printable grids in `riddims_grids.md`, its generator in
+> `tools/gen_mt40_riddims.py`). Licensing: `LICENSING.md`, section "The MT-40X fork".
+
 Felucca is open-source custom synthesizer firmware for the **M-VAVE FM-1**.
 
 The FM-1 is the only supported hardware target. This project does not provide, maintain, or accept requests for ports to other devices or software platforms.

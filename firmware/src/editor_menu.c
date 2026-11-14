@@ -40,6 +40,9 @@ static const uint8_t ED_MENU[][2] = {
     {MI_CPU2, 32},                                     /* 1.6.1, the second core (Discussion #141): 2ND CORE OFF / ON (BETA),
                                                         * SYSTEM, from the next power-on (a FELUCCA_CPU2=0 build: 0..31) */
 #endif
+    {MI_MT40X, 33},                                    /* the MT-40X fork: MT-40X OFF / ON, AUDIO (a runtime state, its
+                                                        * rc is 0: nothing for settings_save to write) */
+    {MI_RIDDIM, 34},                                   /* the MT-40X fork: RIDDIM 1..28, AUDIO (loads the riddim; rc 0) */
 };
 #define ED_MENU_N NELEM(ED_MENU)
 
@@ -84,7 +87,7 @@ static int ed_menu_handle(uint32_t cmd, const uint8_t *a, uint32_t n)
             ed_str("ct", 12);                          /* (EDM_INT: its unit) */
         else
             for (i = 0; i < k; i++)
-                ed_str(menu_vname(row, i), 12);
+                ed_str(menu_vname(row, i), row == MI_RIDDIM ? 16u : 12u);   /* (the riddims' names: "PROMISED LAND" needs 13) */
         ed_b(MI_TAB[row]);                             /* (after the names: an older editor stops before it) */
         ed_str(MTAB_NAME[MI_TAB[row]], 12);
         return 1;

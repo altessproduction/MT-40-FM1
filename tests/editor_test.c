@@ -11,7 +11,7 @@ static unsigned char host_samples[3][0x14000];
 #define main hostsim_main
 #include "hostsim.c"
 #undef main
-#define MENU_N (32u + FELUCCA_CPU2)                  /* 1.6.1 (core.h FELUCCA_CPU2, the default): 2ND CORE, id 32 */
+#define MENU_N (34u + FELUCCA_CPU2)                  /* 1.6.1 (core.h FELUCCA_CPU2, the default): 2ND CORE, id 32; the MT-40X fork: MT-40X id 33, RIDDIM id 34 */
 
 static uint32_t host_progress = 1, host_erases, host_writes;
 static uint8_t host_wire[4096];
@@ -183,7 +183,7 @@ static int preferences(void)
         host_wire[e - 33] == 0 &&                        /* (no bank since 1.0.3) */
         host_wire[e - 32] == 0x53 && host_wire[e - 31] == 1 && host_wire[e - 30] == 3 &&
         host_wire[e - 29] == 0x50 && host_wire[e - 28] == 1 && host_wire[e - 27] == 3 &&   /* FM6 v2: no bank, preset patches */
-        host_wire[e - 26] == 0x4E && host_wire[e - 25] == 1 && host_wire[e - 24] == MENU_N &&   /* MENU settings: 33 items (1.6.1: 2ND CORE; a FELUCCA_CPU2=0 build 32) */
+        host_wire[e - 26] == 0x4E && host_wire[e - 25] == 1 && host_wire[e - 24] == MENU_N &&   /* MENU settings: 35 items (1.6.1: 2ND CORE; the MT-40X fork's MT-40X, RIDDIM; a FELUCCA_CPU2=0 build 34) */
         host_wire[e - 23] == 0x52 && host_wire[e - 22] == 1 && host_wire[e - 21] == 4 &&   /* RATCH */
         host_wire[e - 20] == 0x4C && host_wire[e - 19] == 1 && host_wire[e - 18] == 1 &&   /* 1.1 parameter locks */
         host_wire[e - 17] == 0x41 && host_wire[e - 16] == 1 && host_wire[e - 15] == 0 && host_wire[e - 14] == 1 &&   /* 1.2: 128 */
@@ -858,7 +858,7 @@ static int usb_burst(void)
 }
 
 /* ---- MENU_DESC / MENU_SET (72, 73): the menu's settings over the editor ---- */
-typedef struct { uint32_t index, id, kind, nnames, tab, rest; int32_t value, min, max; char name[16], names[20][12], tabname[16], unit[16]; } menu_item_t;
+typedef struct { uint32_t index, id, kind, nnames, tab, rest; int32_t value, min, max; char name[16], names[28][16], tabname[16], unit[16]; } menu_item_t;
 static uint32_t menu_desc(uint32_t index, menu_item_t *it)   /* the reply's payload length; it parsed */
 {
     uint8_t a[1] = {(uint8_t)index};
@@ -875,8 +875,8 @@ static uint32_t menu_desc(uint32_t index, menu_item_t *it)   /* the reply's payl
         for (k = 0; p < n - 1u && host_wire[p] && k < 15u; ) it->unit[k++] = (char)host_wire[p++];
         p++;
     }
-    while (it->kind == 0u && p < n - 1u && it->nnames < 20u && (int32_t)it->nnames < it->max - it->min + 1) {   /* (kind 0: max - min + 1) */
-        for (k = 0; p < n - 1u && host_wire[p] && k < 11u; ) it->names[it->nnames][k++] = (char)host_wire[p++];
+    while (it->kind == 0u && p < n - 1u && it->nnames < 28u && (int32_t)it->nnames < it->max - it->min + 1) {   /* (kind 0: max - min + 1; the MT-40X fork's RIDDIM has 28) */
+        for (k = 0; p < n - 1u && host_wire[p] && k < 15u; ) it->names[it->nnames][k++] = (char)host_wire[p++];
         p++; it->nnames++;
     }
     it->tab = 127;                                          /* 1.0.5: then the row's tab, index and name */
@@ -897,7 +897,7 @@ static uint32_t menu_set(uint32_t id, int32_t v)            /* -> rc; host_wire[
 #define TCH_NAMES "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,OMNI,OFF"
 static int menu_protocol(void)
 {
-    static const char *const WANT[33][2] = {
+    static const char *const WANT[35][2] = {
         {"COLOR", 0}, {"STYLE", "FLAT,LINE"}, {"LARGE", "OFF,ON"}, {"ANIM", "ON,OFF,IDLE"}, {"LEDS", "OFF,DIM LO,DIM HI,INV,INV LO,INV HI"},
         {"HOLD", "0.3 s,0.4 s,0.5 s,0.6 s"}, {"KNOB ACCEL", "OFF,ON"}, {"FX LATCH", "OFF,ON"}, {"BPM LOCK", "OFF,ON"},
         {"SPEAKER EQ", "FLAT,LOWCUT,BASS+"}, {"USB LEVEL", "MASTER,FIXED"}, {"USB SERIAL", "ON,OFF"},
@@ -911,15 +911,20 @@ static int menu_protocol(void)
         {"SELECT", "BPM,PAGE,MODW,VEL"},                                                             /* (1.5.5; 1.5.6 MODW VEL) */
         {"T1 CHANNEL", TCH_NAMES}, {"T2 CHANNEL", TCH_NAMES}, {"T3 CHANNEL", TCH_NAMES}, {"T4 CHANNEL", TCH_NAMES},   /* (1.5.5) */
         {"AUTO SELECT", "OFF,ON"}, {"SCREEN WAKE", "+MIDI,PANEL"},                                   /* (1.5.5) */
-        {"2ND CORE", "OFF,ON (BETA)"}};                                                           /* (1.6.1; OFF the default) */
-    static const int32_t DEF[33] = {-1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0};   /* (COLOR: the default palette) */
-    static const uint8_t TAB[33] = {0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 4, 2, 2, 2, 4, 1, 0, 0, 1, 1, 3, 2, 0, 4, 1, 3, 3, 3, 3, 3, 3, 4};   /* DISPLAY CONTROL AUDIO
+        {"2ND CORE", "OFF,ON (BETA)"},                                                            /* (1.6.1; OFF the default) */
+        {"MT-40X", "OFF,ON"},                                                                     /* (the MT-40X fork: a runtime state) */
+        {"RIDDIM", "ONE DROP,STEPPERS,ROCKERS,DUBWALK,MEDITATE,DUB CUT,ZION,SKA,HEAVENLESS,TONIGHT,"
+                   "GET IN GROOVE,HOT MILK,ANSWER,PROMISED LAND,GUNMAN,HERE I COME,SLENG TENG,TEMPO,"
+                   "PEANY PEANY,DANCEHALL,DEMBOW,JUNGLE,DUBSTEP,MT40 POPS,MT40 SLOWRK,MT40 SWING,"
+                   "MT40 WALTZ,MT40 SAMBA"}};                                            /* (the MT-40X fork: the bank loads it) */
+    static const int32_t DEF[35] = {-1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 0};   /* (COLOR: the default palette) */
+    static const uint8_t TAB[35] = {0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 4, 2, 2, 2, 4, 1, 0, 0, 1, 1, 3, 2, 0, 4, 1, 3, 3, 3, 3, 3, 3, 4, 2, 2};   /* DISPLAY CONTROL AUDIO
                                                                                                          * MIDI SYSTEM (1.2) */
     static const char *const TABN[5] = {"DISPLAY", "CONTROL", "AUDIO", "MIDI", "SYSTEM"};
     int bad = 0, ok = 1;
     uint32_t i, k, n;
     menu_item_t it;
-    char joined[128];
+    char joined[512];                                  /* (the MT-40X fork's RIDDIM: 28 names joined) */
     const char *json = getenv("MENU_JSON");
     FILE *jf = json ? fopen(json, "w") : 0;
     reset();
@@ -946,7 +951,7 @@ static int menu_protocol(void)
         }
     }
     if (jf) { fprintf(jf, "]\n"); fclose(jf); }
-    bad += check(FELUCCA_CPU2 ? "MENU_DESC: 33 items (... 1.5.5, then 1.6.1 2ND CORE id 32 last: OFF / ON (BETA), OFF by default), names, defaults" : "MENU_DESC (FELUCCA_CPU2=0): 32 items (1.0.4's 12 in the menu's order, then 1.1's CLICK, CLICK LEVEL, COUNT-IN, 1.2's RESTORE LAST, SCALE LEDS, SCREEN OFF, 1.2's SCOPE, STEP PREVIEW, CHORD ENTRY, MIDI IN, TUNE, 1.3's HOME, 1.5's HELP, 1.5.5's SELECT, T1..T4 CHANNEL, AUTO SELECT, SCREEN WAKE), ids 0..31, names, defaults; TUNE a number -50..50 ct", ok);
+    bad += check(FELUCCA_CPU2 ? "MENU_DESC: 35 items (... 1.5.5, then 1.6.1 2ND CORE id 32, the MT-40X fork's MT-40X id 33 OFF / ON and RIDDIM id 34 (the 28 riddims, AUDIO) last), names, defaults" : "MENU_DESC (FELUCCA_CPU2=0): 34 items (1.0.4's 12 in the menu's order, then 1.1's CLICK, CLICK LEVEL, COUNT-IN, 1.2's RESTORE LAST, SCALE LEDS, SCREEN OFF, 1.2's SCOPE, STEP PREVIEW, CHORD ENTRY, MIDI IN, TUNE, 1.3's HOME, 1.5's HELP, 1.5.5's SELECT, T1..T4 CHANNEL, AUTO SELECT, SCREEN WAKE, the MT-40X fork's MT-40X, RIDDIM), ids 0..33, names, defaults; TUNE a number -50..50 ct", ok);
     bad += check("MENU_DESC (1.0.5): after the names (TUNE: the unit) each item's tab, index and name (DISPLAY CONTROL AUDIO MIDI SYSTEM)", ok);
     {   /* an older editor reads the names and stops: the tab is past them, nothing it reads moved */
         uint32_t m = menu_desc(4, &it), p = 14, q;
