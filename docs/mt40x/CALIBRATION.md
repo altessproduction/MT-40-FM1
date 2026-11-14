@@ -6,7 +6,8 @@ est le même que celui de la v0.1 : comparer, corriger, régénérer, recompiler
 
 ## Le principe
 
-1. **Imprimez** `riddims_grids.md` : chaque riddim y est une grille de 64 pas, quatre pistes.
+1. **Imprimez** `riddims_grids.md` : chaque riddim y est une grille de 64 pas, trois pistes
+   (batterie, basse, skank — la v0.5 a retiré la mélodie, la machine n'en a pas).
 2. **Jouez le même riddim** sur le MT-40 (preset correspondant) et sur le FM-1
    (MENU > AUDIO > RIDDIM), même tempo, et comparez pas à pas.
 3. **Corrigez** `riddims.json` (un éditeur de texte suffit).
@@ -21,20 +22,20 @@ Un caractère = une double-croche ; `|` ferme le temps, `+` ferme la mesure (4 m
 
 ```
 DRUM K...|S...|K...|S...+K...|S...|K...|S...+     (le glyphe = la lane)
-BASS 1...|....|5...|....+1...|....|b7..|...x+     (l'intervalle au-dessus de la racine)
+BASS 1..1|1...|5..5|....+1...|....|b7..|...x+     (l'intervalle au-dessus de la racine)
 SKNK ..x.|....|..x.|....+                              (x = le pas de l'accord)
-MEL  ....|..E |....|....+                              (la note, absolue)
 ```
 
 - DRUM : **K** kick, **S** caisse claire, **P** clap, **H** charley fermé, **O** charley
   ouvert, **T** tom, **R** rim, **C** cowbell ; `.` = rien. Une seule lane par pas (c'est la
   forme de la banque SLOOP Dub).
 - BASS : l'intervalle au-dessus de la racine de mesure — `1` la fondamentale, `b3` la
-  tierce mineure, `4`, `5`, `b7`, `6`, `8` l'octave... `.` = un silence qui **tient** la
-  note précédente (TIE) ; `x` = le pas où la note tenue **s'arrête** (MT40_CUT).
+  tierce mineure, `4`, `5`, `b7`, `6`, `8` l'octave... La v0.5 écrit l'articulation de la
+  machine (`tools/mt40_bass.py`) : la même intervalle qui revient sur les pas suivants est
+  la note **re-frappée** (plus légère), `.` = un silence qui **tient** la dernière frappe
+  (TIE), `x` = le pas où la note tenue **s'arrête** (MT40_CUT).
 - SKNK : `x` où l'accord frappe ; sa fondamentale est celle de la mesure (le JSON la donne :
   champ `chords`).
-- MEL : la note écrite (C, C#, D...), indépendante de la racine.
 
 ## Ce qu'il faut vérifier en priorité
 
@@ -61,9 +62,10 @@ MEL  ....|..E |....|....+                              (la note, absolue)
   "skank_qual": 1,               // 0 MAJ, 1 MIN, 2 DOM7 — tel qu'écrit
   "drums": [[step, lane, vel], ...],   // lane : 0 K, 1 S, 2 P, 3 H, 4 O, 5 T, 6 R, 7 C
   "bass":  [[step, degré, vel], ...],  // degré en demi-tons au-dessus de la racine ;
-                                       // 253 = la note tenue s'arrête là
-  "skank": [[step, vel], ...],
-  "mel":   [[step, note, vel], ...]    // note MIDI absolue
+                                       // 253 = la note tenue s'arrête là ; la v0.5
+                                       // re-frappe chaque tenue (l'articulation de
+                                       // la machine, tools/mt40_bass.py)
+  "skank": [[step, vel], ...]          // la fondamentale de l'accord est celle de la mesure
 }
 ```
 

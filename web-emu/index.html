@@ -317,7 +317,7 @@ body.compact.rotated #firmware-badge {
 <section id="console" aria-label="La console MT-40X">
 
 <h2>MT-40X — LA CONSOLE WEB</h2>
-<p class="lead">Le menu du firmware reste la seule vraie surface de commande de la machine. Cette console est le sucre du web autour : <b>l'interrupteur MT-40X</b> (la ligne <span class="kn">MENU &gt; AUDIO &gt; MT-40X</span>), <b>la banque de riddims</b> — un clic charge le riddim dans les quatre pistes, le même code que la page <span class="kn">RIDDIM</span> — et <b>la vue des quatre pistes</b>, relue depuis le séquenceur du firmware lui-même.</p>
+<p class="lead">Le menu du firmware reste la seule vraie surface de commande de la machine. Cette console est le sucre du web autour : <b>l'interrupteur MT-40X</b> (la ligne <span class="kn">MENU &gt; AUDIO &gt; MT-40X</span>), <b>la banque de riddims</b> — un clic charge le riddim dans les trois pistes de la machine (T1 vous restant), le même code que la page <span class="kn">RIDDIM</span> — et <b>la vue des pistes</b>, relue depuis le séquenceur du firmware lui-même.</p>
 
 <div class="card wide">
 <div class="toolbar">
@@ -326,7 +326,7 @@ body.compact.rotated #firmware-badge {
 </div>
 <div id="riddims"></div>
 <canvas id="grid"></canvas>
-<p class="src">MÉLO / SKANK / BASSE / DRUMS — 64 pas, relus dans les pistes du firmware (un TIE tenu en demi-teinte, le playhead en blanc). Les drums ne transposent jamais ; basse, skanks et mélodie suivent le clavier.</p>
+<p class="src">T1 / SKANK / BASSE / DRUMS — 64 pas, relus dans les pistes du firmware (un TIE tenu en demi-teinte, le playhead en blanc). Les drums ne transposent jamais ; basse et skanks suivent le clavier.</p>
 </div>
 </section>
 
@@ -340,7 +340,7 @@ body.compact.rotated #firmware-badge {
 <h3>LE CLAVIER DE BASSE</h3>
 <ul>
 <li><b>Une clé</b> = l'accord MAJ de sa fondamentale ; <b>la clé juste au-dessus</b> = MIN de la fondamentale d'avant ; <b>deux au-dessus</b> = DOM7. <b>La même clé à nouveau</b> reprend MAJ — chaque fondamentale reste atteignable.</li>
-<li><b>Le premier accord lancé à l'arrêt démarre le séquenceur</b> — le SYNCHRO START du MT-40. Tout l'accompagnement (basse, skanks, mélodie) est re-voisé à l'appui ; <b>rien ne sonne</b> depuis le clavier lui-même.</li>
+<li><b>Le premier accord lancé à l'arrêt démarre le séquenceur</b> — le SYNCHRO START du MT-40. Tout l'accompagnement (basse, skanks) est re-voisé à l'appui ; <b>rien ne sonne</b> depuis le clavier lui-même.</li>
 <li><b>Rien ne presse</b> : le riddim joue comme écrit, ses quatre mesures à ses propres fondamentales. <b>Les drums ne transposent jamais.</b></li>
 <li>Armement : <span class="kn">MENU &gt; AUDIO &gt; MT-40X</span> OFF/ON — ou le bouton de cette page.</li>
 </ul>
@@ -349,7 +349,7 @@ body.compact.rotated #firmware-badge {
 <div class="card">
 <h3>RIDDIM — LE CHARGEMENT</h3>
 <ul>
-<li><span class="kn">MENU &gt; AUDIO &gt; RIDDIM</span> : <span class="kn">KNOB 1</span> choisit parmi les 28, <kbd>OCT+</kbd> charge les <b>quatre pistes</b> (T1 la mélodie, T2 le skank en <b>vrais accords</b> POLY, T3 la basse MONO, T4 la batterie DRUM), <b>le tempo du riddim entre au chargement</b> (66–172).</li>
+<li><span class="kn">MENU &gt; AUDIO &gt; RIDDIM</span> : <span class="kn">KNOB 1</span> choisit parmi les 28, <kbd>OCT+</kbd> charge les <b>trois pistes de la machine</b> (T1 reste la vôtre — pas de mélodie dans la banque, T2 le skank en <b>vrais accords</b> POLY, T3 la basse MONO re-frappée comme la machine, T4 la batterie DRUM), <b>le tempo du riddim entre au chargement</b> (66–172).</li>
 <li>Les <b>fills sont dans le motif</b> (mesure 4), comme chez SLOOP Dub ; <kbd>GLO</kbd>&nbsp;+&nbsp;<kbd>E4</kbd> reste disponible pour les conditions FILL de Felucca.</li>
 <li>Sur cette page, les pastilles de la console font le même chargement d'un clic.</li>
 </ul>

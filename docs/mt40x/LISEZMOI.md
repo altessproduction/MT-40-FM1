@@ -1,10 +1,23 @@
-# MT-40X v0.4 — le Casio MT-40/41 sur le M-VAVE FM-1
+# MT-40X v0.5 — le Casio MT-40/41 sur le M-VAVE FM-1
 
 MT-40X est une fourche (fork) du firmware libre **Felucca v1.8.2** (Hügelton Instruments,
 GPL-3.0) qui ajoute au FM-1 l'accompagnement automatique du **Casio MT-40 / MT-41** : la
 banque de riddims, le clavier de basse, le synchro start. La banque de riddims est celle de
 **SLOOP Dub 1.6** (altessproduction, <https://github.com/altessproduction/sloop-dub-fm1>,
 GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le firmware.
+
+## Nouveau dans la v0.5 (par rapport à la v0.4)
+
+- **Les trois parties de la machine** : la piste mélodie quitte la banque — le MT-40 joue
+  basse et batterie, le skank est la voix du sound system ; la mélodie était celle du
+  toaster de SLOOP Dub. Au chargement, **T1 est vidé et vous reste** (votre son, vos
+  réglages) ; T2 le skank, T3 la basse, T4 la batterie ne changent pas.
+- **La basse re-frappe comme la machine** : le MT-40 pince, il ne tient pas — chaque
+  frappe est suivie d'une re-frappe de la même note, plus légère (et une frappe forte qui
+  tient re-frappe encore à la croche suivante). Le Sleng Teng re-frappait déjà chaque
+  double-croche (sa transcription vérifiée) : il passe inchangé ; les 27 autres riddims
+  gagnent le rebond. Les règles sont dans `tools/mt40_bass.py` ; les grilles imprimables
+  (`riddims_grids.md`) montrent les re-frappes pas à pas.
 
 ## Nouveau dans la v0.4 (par rapport à la v0.3)
 
@@ -47,7 +60,7 @@ GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le f
 1. **Sauvegardez d'abord** : projets, presets utilisateur, échantillons (SAVE > PROJECT, ou
    l'éditeur web). Une installation remplace le firmware, pas vos données flash — mais une
    sauvegarde avant toute manipulation de firmware est la règle.
-2. Copiez `mt40x_v1.8.2-0.4.fwsc` sur une clé USB (FAT32) ou passez par l'installateur web.
+2. Copiez `mt40x_v1.8.2-0.5.fwsc` sur une clé USB (FAT32) ou passez par l'installateur web.
    Sur le FM-1, mode mise à jour via M-UPGRADE, choisissez le paquet, l'appareil redémarre.
    L'écran de démarrage affiche « MT-40X v1.8.2-mt40x ».
 3. Le reste de Felucca 1.8.2 est intact : moteurs, presets, projets, éditeur web, MIDI.
@@ -61,8 +74,9 @@ Le chemin : HOME maintenu → ALGORITHM jusqu'à AUDIO → PRESETS jusqu'à MT-4
 
 **MENU > AUDIO** a deux lignes de plus que Felucca :
 
-- **RIDDIM** : 28 valeurs — un tour de bouton **charge le riddim aussitôt** (les quatre
-  pistes, le tempo). Le nom du riddim s'affiche comme valeur de la ligne.
+- **RIDDIM** : 28 valeurs — un tour de bouton **charge le riddim aussitôt** (les trois
+  pistes de la machine, T1 vous restant, le tempo). Le nom du riddim s'affiche comme
+  valeur de la ligne.
 - **MT-40X** : OFF / ON. ON : **les touches sont le clavier de basse du MT-40** (elles ne
   sonnent plus comme un synthé). OFF : le FM-1 redevient un FM-1.
 
@@ -70,9 +84,9 @@ Une fois un riddim chargé :
 
 | Piste | Contenu | Réglages posés au chargement |
 | --- | --- | --- |
-| T1 | la mélodie du riddim | GATE 127 (les silences la tiennent) |
+| T1 | **libre** — le riddim n'a pas de mélodie (v0.5), jouez-y la vôtre | rien (votre son, vos réglages) |
 | T2 | le skank : l'accord de la mesure (racine, tierce, quinte, + septième) | GATE 40, VOICE POLY |
-| T3 | la basse : le groove au-dessus de la racine de mesure | GATE 127, VOICE MONO |
+| T3 | la basse : le groove au-dessus de la racine de mesure, re-frappé comme la machine | GATE 127, VOICE MONO |
 | T4 | la batterie (un hit par pas au plus, vélocités d'origine) | LEN 64, DIV 1/16 |
 
 Les gestes, l'esprit MT-40 :
@@ -83,13 +97,14 @@ Les gestes, l'esprit MT-40 :
   un demi-ton au-dessus donne la MINEUR de la fondamentale précédente ; deux demi-tons
   au-dessus la SEPTIÈME de la fondamentale précédente ; **la même touche deux fois rend la
   main au majeur de cette touche** (toutes les fondamentales restent atteignables).
-  Toute la basse, les accords du skank et la mélodie suivent aussitôt ; la batterie ne
-  transpose jamais.
+  Toute la basse et les accords du skank suivent aussitôt ; la batterie ne transpose
+  jamais.
 - **SYNCHRO START** : transport arrêté et MT-40X armé, le premier accord lancé démarre la
   lecture. Comme sur la machine.
-- La basse est réécrite en degrés au-dessus de la fondamentale ; un silence **tient** la
-  note (TIE), un pas marqué `cut` dans les grilles **coupe** (les queues pincées du Sleng
-  Teng). Le son de basse reste le vôtre : un patch ANALOG bien grave et bref sonne MT-40.
+- La basse est réécrite en degrés au-dessus de la fondamentale, et **re-frappée comme la
+  machine** (chaque frappe, sa re-frappe plus légère) ; un silence **tient** la note (TIE),
+  un pas marqué `cut` dans les grilles **coupe** (les queues pincées du Sleng Teng). Le
+  son de basse reste le vôtre : un patch ANALOG bien grave et bref sonne MT-40.
 
 ## Limites connues (v0.2)
 
@@ -107,7 +122,7 @@ Les gestes, l'esprit MT-40 :
 
 ## Recompiler et recalibrer
 
-La source complète (GPL-3.0) est dans `mt40x_v1.8.2-0.4_source.zip`. Le workflow de
+La source complète (GPL-3.0) est dans `mt40x_v1.8.2-0.5_source.zip`. Le workflow de
 calibration — grilles imprimables `riddims_grids.md`, correction de `riddims.json`,
 régénération, recompilation — est dans `CALIBRATION.md`.
 

@@ -44,10 +44,10 @@ rythme *Rock* de la machine pour **Wayne Smith** : « Under Mi Sleng Teng » sor
 **Sleng Teng**, le riddim le plus versionné de l'histoire du reggae, est né du preset d'une
 MT-40.
 
-MT-40X rapporte ce fonctionnement au FM-1 tel quel : le riddim (batterie, basse, skank,
-mélodie) tourne dans le séquenceur, et **le clavier re-fonde l'accompagnement en direct**,
-comme la machine. Le Sleng Teng embarqué est la transcription vérifiée (l'onglet de Noel
-Davey, le roll Ableton, **82 BPM**) — le *Rock* de la MT-40.
+MT-40X rapporte ce fonctionnement au FM-1 tel quel : le riddim (batterie, basse, skank —
+les trois parties de la machine) tourne dans le séquenceur, et **le clavier re-fonde
+l'accompagnement en direct**, comme la machine. Le Sleng Teng embarqué est la transcription
+vérifiée (l'onglet de Noel Davey, le roll Ableton, **82 BPM**) — le *Rock* de la MT-40.
 
 ## 2. Ce que fait MT-40X
 
@@ -56,9 +56,10 @@ Davey, le roll Ableton, **82 BPM**) — le *Rock* de la MT-40.
   pas (chaque hit, chaque vélocité, chaque degré, chaque racine de mesure ; copie conforme
   du générateur dans `tools/sloop_riddims_data.py`). Les six rythmes de la MT-40 y sont :
   **SLENG TENG** (= Rock) plus POPS, SLOWRK, SWING, WALTZ, SAMBA.
-- **Le chargement** : MENU &gt; AUDIO &gt; RIDDIM, un tour de bouton — les **quatre pistes**
-  entrent aussitôt (T1 la mélodie, T2 le skank en vrais accords POLY, T3 la basse MONO,
-  T4 la batterie sur le moteur DRUM) **avec le tempo du riddim** (66…172 BPM).
+- **Le chargement** : MENU &gt; AUDIO &gt; RIDDIM, un tour de bouton — les **trois pistes
+  de la machine** entrent aussitôt (T2 le skank en vrais accords POLY, T3 la basse MONO,
+  T4 la batterie sur le moteur DRUM ; **T1 reste la vôtre**, la mélodie était la voix du
+  toaster de SLOOP Dub, la MT-40 n'en a pas) **avec le tempo du riddim** (66…172 BPM).
 - **Le clavier de basse** : MT-40X armé, les **27 touches du FM-1 (MIDI 53…79, F3 à G5)**
   programment l'accompagnement au lieu de sonner :
   - **une touche** = la fondamentale, en **majeur** (sa classe de hauteur est ramenée dans
@@ -69,8 +70,7 @@ Davey, le roll Ableton, **82 BPM**) — le *Rock* de la MT-40.
   - **la même touche deux fois** = retour au majeur de cette touche ;
   - **rien pressé** : le riddim joue **comme écrit**, ses quatre racines de mesure à lui
     (ONE DROP A-A-D-E, HEAVENLESS A-F-A-G…).
-  La basse, les accords du skank et la mélodie suivent aussitôt ; **la batterie ne
-  transpose jamais**.
+  La basse et les accords du skank suivent aussitôt ; **la batterie ne transpose jamais**.
 - **SYNCHRO START** : transport arrêté et MT-40X armé, **le premier accord lancé démarre
   la lecture** — comme sur la machine.
 - **Les fills sont dans le motif** (mesure 4), comme dans SLOOP Dub ; les conditions FILL
@@ -78,8 +78,10 @@ Davey, le roll Ableton, **82 BPM**) — le *Rock* de la MT-40.
 - **MENU &gt; AUDIO** a deux lignes de plus : **MT-40X** (OFF/ON) et **RIDDIM** (1…28) —
   les réglages **33** et **34** du protocole éditeur web.
 
-Les silences **tiennent** la note (TIE) et les pas marqués `cut` la **coupent** (les queues
-pincées du Sleng Teng) ; c'est la notation des grilles imprimables `riddims_grids.md`.
+La basse **ne tient jamais** une note : chaque frappe est **re-frappée** aussitôt, plus
+légère — le pincé de la machine (le Sleng Teng le fait sur chaque double-croche, c'est son
+rebond). Les silences restants **tiennent** la note (TIE) et les pas marqués `cut` la
+**coupent** ; c'est la notation des grilles imprimables `riddims_grids.md`.
 
 ## 3. Emploi — pas à pas
 
@@ -100,10 +102,10 @@ Puis, pas à pas :
 
 1. **Sauvegardez** vos projets, presets et échantillons (SAVE &gt; PROJECT, ou l'éditeur
    web) — la règle avant toute manipulation de firmware.
-2. **Flashez** `mt40x_v1.8.2-0.4.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
+2. **Flashez** `mt40x_v1.8.2-0.5.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
    démarrage affiche « MT-40X v1.8.2-mt40x ».
 3. **MENU &gt; AUDIO &gt; RIDDIM** : sur la ligne RIDDIM, tournez **OCT+** — chaque cran
-   charge le riddim (les quatre pistes, le tempo, **les sons MT-40**) et le nom s'affiche
+   charge le riddim (les trois pistes, le tempo, **les sons MT-40**) et le nom s'affiche
    aussitôt à l'écran.
 4. **MENU &gt; AUDIO &gt; MT-40X : ON** — remontez d'une ligne (PRESETS), OCT+ encore :
    les touches deviennent le clavier de basse.
@@ -112,18 +114,18 @@ Puis, pas à pas :
 
 | Piste | Contenu au chargement | Réglages posés |
 | --- | --- | --- |
-| T1 | la mélodie du riddim | GATE 127 (les silences la tiennent) |
+| T1 | **libre** — le riddim n'a pas de mélodie, jouez-y la vôtre | rien (votre son, vos réglages) |
 | T2 | le skank : l'accord de la mesure (racine, tierce, quinte, + septième) | GATE 40, VOICE POLY |
-| T3 | la basse : le groove au-dessus de la racine de mesure | GATE 127, VOICE MONO |
+| T3 | la basse : le groove au-dessus de la racine de mesure, re-frappé comme la machine | GATE 127, VOICE MONO |
 | T4 | la batterie (un hit par pas au plus, vélocités d'origine) | LEN 64, DIV 1/16 |
 
-**Les sons MT-40 posés au chargement (v0.4)** : T1..T3 reçoivent des timbres ANALOG dans
-l'esprit Casiotone — T3 la pluck carrée creuse de la basse, T1 l'impulsion fine des
-mélodies, T2 l'attaque courte du skank — posés à chaque chargement de riddim, avec vos
-LEVEL, PAN, envois d'effets et INSERT conservés. Ce sont des approximations à ajuster
-l'OSC/FLT de la piste ; la banque fidèle des 22 timbres est la calibration à venir.
+**Les sons MT-40 posés au chargement (v0.4)** : T2 et T3 reçoivent des timbres ANALOG dans
+l'esprit Casiotone — T3 la pluck carrée creuse de la basse, T2 l'attaque courte du skank —
+posés à chaque chargement de riddim, avec vos LEVEL, PAN, envois d'effets et INSERT
+conservés. Ce sont des approximations à ajuster l'OSC/FLT de la piste ; la banque fidèle
+des 22 timbres est la calibration à venir.
 
-**Limites connues (v0.4)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
+**Limites connues (v0.5)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
 sauvegardé dans le projet — rechargez après extinction (les pistes, elles, restent si vous
 sauvegardez le projet) ; MT-40X armé, les touches ne sonnent pas (jouez au MIDI ou
 désarmez) ; le registre du skank reste celui de la banque (57…68) ; les patterns font 4
@@ -179,15 +181,16 @@ propre code du firmware — aucune source modifiée. La façade suit la disposit
 `reference_emu/` de SLOOP Dub (knobs, boutons, clés, clavier d'ordinateur, MIDI entrée) ;
 la **flash SPI est une image IndexedDB** : projets, réglages et autosave survivent au
 rechargement. Sous la machine, la **console web** : l'interrupteur MT-40X, les 28 riddims
-un clic, la vue des quatre pistes avec le playhead — l'état affiché est l'état du firmware.
+un clic, la vue des pistes avec le playhead — l'état affiché est l'état du firmware.
 
 Le smoke test livré : `node web-emu/wasm_smoke_test.js web-emu/dist/mt40x.wasm` — les
-exports, le boot, la banque (28 noms, tempos), le chargement des quatre pistes, PLAY + le
+exports, le boot, la banque (28 noms, tempos), le chargement des trois pistes de la
+machine (T1 restant vide), PLAY + le
 chemin audio, le clavier MAJ / +1 MIN / +2 DOM7 — finit sur `AUDIO-PATH-OK`.
 
 ## 6. Installer le firmware
 
-Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.4.fwsc`** (dans les assets de
+Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.5.fwsc`** (dans les assets de
 la release GitHub, avec le `.bin` applicatif, les `SHA256SUMS` et les licences). Il
 **inclut le loader de mise à jour** : vous pouvez toujours en ressortir, vers V15 ou vers
 un autre firmware.
@@ -244,7 +247,7 @@ JIELI_TOOLCHAIN=/chemin/toolchain AC79_SDK=/chemin/fw-AC79_AIoT_SDK ./build.sh -
 
 - Prérequis et SDK : **[BUILDING.md](BUILDING.md)** (toolchain JieLi pi32v2 —
   `tools/get_toolchain.sh` — et SDK AC79 ; Pillow pour les tables générées).
-- Le build produit `build/mt40x_v1.8.2-0.4.fwsc` et `build/release-0.4/` (paquet, `.bin`,
+- Le build produit `build/mt40x_v1.8.2-0.5.fwsc` et `build/release-0.4/` (paquet, `.bin`,
   `SHA256SUMS`, licences, attribution des échantillons).
 - **La banque de riddims** : `riddims.json` est la source de vérité ;
   `python3 tools/gen_mt40_riddims.py` régénère `firmware/src/mt40_riddims.h` et les grilles

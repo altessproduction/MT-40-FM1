@@ -1,5 +1,40 @@
 # MT-40X — changelog
 
+## v0.5 (mt40x_v1.8.2-0.5) — les trois parties de la machine, la basse qui re-frappe
+
+- **La mélodie quitte la banque** : le MT-40 joue basse et batterie, le skank est la voix
+  du sound system ; la mélodie était celle du toaster de SLOOP Dub, la machine n'en a pas.
+  `riddims.json` (format `mt40x-riddims-2`) et la struct `mt40_riddim_t` perdent le champ
+  mel (3 584 B de flash rendus) ; au chargement **T1 est vidé et vous reste** (son,
+  réglages, enregistrement). T2 skank / T3 basse / T4 batterie ne changent pas.
+- **La basse re-frappe comme la machine** (`tools/mt40_bass.py`, le cœur de cette version)
+  : le MT-40 pince, il ne tient pas — sa Rock jouait une frappe par double-croche. Les
+  grooves convertis de SLOOP Dub frappaient une note puis la tenaient (TIE) : les
+  **répétitions de note manquaient**, la basse lisait tenue là où la machine rebondit.
+  Maintenant chaque frappe est suivie d'une **re-frappe de la même note** à la
+  double-croche suivante (−22 de vélocité), et une frappe forte qui tient trois pas
+  re-frappe encore à la croche suivante (−34, plancher 64) ; les queues restent celles du
+  groove (`cut`), les silences restants tiennent. Le Sleng Teng (`mtstut`, la
+  transcription vérifiée Noel Davey) et la marche des Roots Radics (`mtmarch`)
+  re-frappaient déjà : ils passent **inchangés** ; les autres grooves gagnent le rebond
+  (932 frappes de basse dans la banque, contre 750 à l'identique SLOOP). Un degré, une
+  racine, un drum, un skank : rien d'autre ne bouge.
+- **Le DOM7 suit la note** : le turnaround (la dernière quinte de mesure qui descend au
+  b7) s'applique à la quinte **et à ses re-frappes** — la course entière (frappe + pincés)
+  descend ensemble, là où un pincé en fin de mesure aurait pu échapper à la règle
+  (`mt40.c mt40_deg`).
+- La chaîne de provenance suit : `verify_bank.py` vérifie drums/skank/racines/accords à
+  l'identique SLOOP Dub 1.6 et la basse contre `mt40_bass.articulate` (un calage à la main
+  ensuite est signalé comme dérive, pas une erreur) ; `gen_mt40_riddims.py --bootstrap`
+  donne directement la forme v0.5. Les grilles imprimables (`riddims_grids.md`) montrent
+  les re-frappes : la même intervalle écrite sur les pas suivants est la note re-frappée.
+- Le paquet : `docs/firmware/mt40x_v1.8.2-0.5.fwsc` (610 286 B, identité `FM-1_23456`), la
+  release `build/release-0.5/`. L'émulateur recompilé (wasm 1 247 075 B, `docs/dub/`
+  synchronisé, la console affiche T1 libre) ; le smoke test v0.5 passe : AUDIO-PATH-OK,
+  « the machine's three tracks loaded, T1 left empty », le clavier re-racine. `ui_test`
+  passe sur les deux builds (défaut et FELUCCA_CPU2=0) : le chargement, la re-frappe à la
+  double-croche, T1 vide, le clavier MAJ / +1 MIN / +2 DOM7.
+
 ## v0.4 (mt40x_v1.8.2-0.4) — les sons MT-40 et l'affichage du MENU
 
 - **Les sons MT-40 posés au chargement** (`mt40.c mt40_sounds`) : chaque chargement de

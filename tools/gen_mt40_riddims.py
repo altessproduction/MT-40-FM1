@@ -3,6 +3,7 @@
 # MT-40X: converts the riddim bank into the firmware's data.
 #
 #   python3 tools/gen_mt40_riddims.py --bootstrap   riddims.json from SLOOP Dub 1.6 (tools/sloop_riddims_data.py),
+#                                                   the v0.5 shape (no melody, the bass re-struck),
 #                                                   then mt40_riddims.h + riddims_grids.md
 #   python3 tools/gen_mt40_riddims.py               mt40_riddims.h + riddims_grids.md from the riddims.json
 #                                                   as it stands (the calibration round-trip: edit the JSON,
@@ -20,6 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, ".."))
 sys.path.insert(0, HERE)
 import sloop_riddims_data as S   # noqa: E402  (the vendored SLOOP Dub 1.6 bank, GPL-3.0-only)
+import mt40_bass as M            # noqa: E402  (the v0.5 articulation: no melody, the bass re-struck)
 
 STEPS = 64
 REST = 255          # MT40_REST in mt40.h
@@ -51,14 +53,16 @@ MD_PATH = os.path.join(ROOT, "riddims_grids.md")
 
 
 def sloop_to_json():
-    """the vendored bank -> riddims.json (the editable, calibratable form)"""
+    """the vendored bank -> riddims.json (the editable, calibratable form), the v0.5 shape:
+    the machine's three parts (the melody was SLOOP Dub's toaster's voice, the machine has
+    none) and the bass as the machine plucks it (mt40_bass.py's re-strikes)"""
     S.check_bank()                       # the upstream bank's own consistency checks
     riddims = []
     for defn in S.RIDDIM_DEFS:
         name, roots = defn[0], list(defn[1])
         chords = list(defn[5]) if len(defn) > 5 else roots
         notes, vels = S.build_riddim(defn)
-        drums, bass, skank, mel = [], [], [], []
+        drums, bass, skank = [], [], []
         for st in range(STEPS):
             bar = st // 16
             n = notes[3][st]
@@ -73,9 +77,6 @@ def sloop_to_json():
                 bass.append([st, deg, vels[0][st]])
             if vels[1][st]:
                 skank.append([st, vels[1][st]])
-            n = notes[2][st]
-            if n != S.REST:
-                mel.append([st, n, vels[2][st]])
         riddims.append({
             "name": name,
             "bpm": SLOOP_BPM[name],
@@ -84,12 +85,12 @@ def sloop_to_json():
             "skank_qual": 1,              # the stabs' chord as authored: 0 MAJ, 1 MIN, 2 DOM7
                                           # (SLOOP Dub's dub_skank_conf default: A MIN)
             "drums": drums,               # [step, lane, velocity]
-            "bass": bass,                 # [step, semitones over the bar's root (253 = the held note ends), velocity]
+            "bass": M.articulate(bass),   # [step, semitones over the bar's root (253 = the held note
+                                          # ends), velocity], the machine's re-strikes added
             "skank": skank,               # [step, velocity]; the chord's root is the bar's
-            "mel": mel,                   # [step, MIDI note as authored, velocity]
         })
     return {
-        "format": "mt40x-riddims-1",
+        "format": "mt40x-riddims-2",
         "source": SOURCE,
         "lanes": {"BD": 0, "SD": 1, "CP": 2, "CH": 3, "OH": 4, "TM": 5, "RS": 6, "CB": 7},
         "qualities": ["MAJ", "MIN", "DOM7"],
@@ -127,8 +128,7 @@ def validate(doc):
                 held = True
         for st, vel in r["skank"]:
             assert 0 <= st < STEPS and 0 < vel <= 127, f"{n}: a skank hit"
-        for st, note, vel in r["mel"]:
-            assert 0 <= st < STEPS and 0 <= note <= 127 and 0 < vel <= 127, f"{n}: a mel hit"
+        assert "mel" not in r, f"{n}: the melody left the bank (v0.5, the MT-40's three parts)"
 
 
 def expand_bass(r):
@@ -161,9 +161,12 @@ def emit_h(doc):
     rows.append(" * the generator again. The bank: the twenty-eight riddims of SLOOP Dub 1.6")
     rows.append(" * (altessproduction, https://github.com/altessproduction/sloop-dub-fm1, GPL-3.0-only),")
     rows.append(" * reggae, dub, roots, ska, the Studio One and early-digital classics, dancehall,")
-    rows.append(" * UK bass music and the Casio MT-40's six auto-rhythms. Four bars of sixteenths;")
-    rows.append(" * the bass rides the bar's root (the MT-40 keyboard re-roots it), a rest HOLDS")
-    rows.append(" * (written as a TIE by mt40.c) and MT40_CUT (253) ends the held note. */")
+    rows.append(" * UK bass music and the Casio MT-40's six auto-rhythms -- the machine's three parts")
+    rows.append(" * (drums, bass, skank; v0.5 dropped the melody, T1 of the sequencer stays free). Four")
+    rows.append(" * bars of sixteenths; the bass rides the bar's root (the MT-40 keyboard re-roots it)")
+    rows.append(" * and never holds: every note re-strikes as the machine plucks (tools/mt40_bass.py,")
+    rows.append(" * the Rock pattern's articulation), a rest HOLDS the re-strike (written as a TIE by")
+    rows.append(" * mt40.c) and MT40_CUT (253) ends the held note. */")
     rows.append("#ifndef FELUCCA_MT40_RIDDIMS_H")
     rows.append("#define FELUCCA_MT40_RIDDIMS_H")
     rows.append('#include "mt40.h"')
@@ -181,11 +184,6 @@ def emit_h(doc):
         skv = [0] * STEPS
         for st, vel in r["skank"]:
             skv[st] = vel
-        mnote = [REST] * STEPS
-        mvel = [0] * STEPS
-        for st, note, vel in r["mel"]:
-            mnote[st] = note
-            mvel[st] = vel
 
         def arr(v):
             return "{" + ", ".join(str(x) for x in v) + "}"
@@ -194,9 +192,7 @@ def emit_h(doc):
         rows.append(f"        {arr(dvel)},")
         rows.append(f"        {arr(bdeg)},")
         rows.append(f"        {arr(bvel)},")
-        rows.append(f"        {arr(skv)},")
-        rows.append(f"        {arr(mnote)},")
-        rows.append(f"        {arr(mvel)}}},")
+        rows.append(f"        {arr(skv)}}},")
     rows.append("};")
     rows.append("")
     rows.append("/* pointers, not a struct array by value: an array of const structs is no constant")
@@ -234,7 +230,9 @@ def emit_md(doc):
     rows.append("One cell = a sixteenth, four bars of 16 (the `+` closes a bar). The drums: one hit a step")
     rows.append("at the most, the glyph is the lane (**K**ick, **S**nare, cla**P**, **H**at, **O**pen hat, **T**om, **R**im, **C**owbell,")
     rows.append("`.` = nothing). The bass: the interval over the bar's root (`1` the root, `b3`, `4`, `5`, `b7`, `6`,")
-    rows.append("`8` the octave... `.` a rest that HOLDS, `x` the step where the held note ends (MT40_CUT)).")
+    rows.append("`8` the octave... `.` a rest that HOLDS, `x` the step where the held note ends (MT40_CUT));")
+    rows.append("the bank v0.5 re-strikes every hold as the machine plucks (tools/mt40_bass.py): the same")
+    rows.append("interval written on the next cells is the note struck again, the glyph carries no velocity.")
     rows.append("")
     NOTE_N = ["1", "b2", "2", "b3", "3", "4", "b5", "5", "b6", "6", "b7", "7", "8", "b9", "9", "#9", "10"]
     for r in doc["riddims"]:
@@ -259,10 +257,6 @@ def emit_md(doc):
         for st, vel in r["skank"]:
             skv[st] = vel
         rows.append("SKNK " + grid_line(skv, STEPS, None))
-        mnote = [None] * STEPS
-        for st, note, _vel in r["mel"]:
-            mnote[st] = note
-        rows.append("MEL  " + grid_line(mnote, STEPS, lambda n: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"][n % 12] if n is not None else "."))
         rows.append("```")
         rows.append("")
     return "\n".join(rows) + "\n"
@@ -279,7 +273,7 @@ def main():
     else:
         with open(JSON_PATH) as f:
             doc = json.load(f)
-        assert doc.get("format") == "mt40x-riddims-1", "riddims.json: wrong format"
+        assert doc.get("format") == "mt40x-riddims-2", "riddims.json: wrong format (mt40x-riddims-2, the v0.5 bank)"
     validate(doc)
     with open(H_PATH, "w") as f:
         f.write(emit_h(doc))

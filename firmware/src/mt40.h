@@ -2,12 +2,14 @@
  * Copyright (C) 2026 MT-40X contributors (Felucca by Leo Kuroshita / Hugelton Instruments,
  * riddim bank by altessproduction's SLOOP Dub 1.6, both GPL-3.0-only) */
 /* MT-40X: the Casio MT-40 / 41's auto-accompaniment on the FM-1. A riddim (its drum loop,
- * its bass, its skank, its melody) loads into the four tracks; the keys, while MT-40X is
- * armed, are the MT-40's bass keyboard: a key re-roots the whole accompaniment live, the
- * key a semitone above plays it minor, two above seventh (CALIBRATION.md's rule). The
- * bank is mt40_riddims.h (tools/gen_mt40_riddims.py): the twenty-eight riddims of SLOOP
- * Dub 1.6. The drums never transpose; the bass, the skank's chords and the melody follow
- * the keyboard; nothing pressed, the riddim plays as written (its own four bar roots). */
+ * its bass, its skank — the machine's three parts; v0.5 dropped the melody, T1 of the
+ * sequencer stays the user's) loads into the tracks; the keys, while MT-40X is armed, are
+ * the MT-40's bass keyboard: a key re-roots the whole accompaniment live, the key a
+ * semitone above plays it minor, two above seventh (CALIBRATION.md's rule). The bank is
+ * mt40_riddims.h (tools/gen_mt40_riddims.py): the twenty-eight riddims of SLOOP Dub 1.6,
+ * the bass re-struck as the machine plucks it (tools/mt40_bass.py). The drums never
+ * transpose; the bass and the skank's chords follow the keyboard; nothing pressed, the
+ * riddim plays as written (its own four bar roots). */
 #ifndef FELUCCA_MT40_H
 #define FELUCCA_MT40_H
 
@@ -30,8 +32,6 @@ typedef struct {
     uint8_t bass_deg[MT40_STEPS];         /* semitones over the bar's root; MT40_CUT ends the hold */
     uint8_t bass_vel[MT40_STEPS];
     uint8_t skank_vel[MT40_STEPS];        /* the stab's velocity, 0 = none; its root is the bar's */
-    uint8_t mel_note[MT40_STEPS];         /* the melody as written (MIDI), MT40_REST none */
-    uint8_t mel_vel[MT40_STEPS];
 } mt40_riddim_t;
 
 extern const mt40_riddim_t *const MT40_RIDDIMS[];

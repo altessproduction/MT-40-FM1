@@ -1,9 +1,12 @@
-# MT-40X — guide des 28 riddims (banque SLOOP Dub 1.6)
+# MT-40X — guide des 28 riddims (banque SLOOP Dub 1.6, l'articulation de la machine)
 
-La banque reprend **exactement** les vingt-huit riddims de SLOOP Dub 1.6
+La banque part des vingt-huit riddims de SLOOP Dub 1.6
 (<https://github.com/altessproduction/sloop-dub-fm1>, étiquette v1.6) : quatre mesures de
-seize doubles-croches, quatre pistes (basse, skank, mélodie, batterie), chaque vélocité et
-chaque racine de mesure d'origine. Le fichier source de la banque est `riddims.json` ; les
+seize doubles-croches, **les trois parties de la MT-40** (basse, skank, batterie — la v0.5
+a retiré la mélodie, qui était la voix du toaster chez SLOOP Dub ; la machine n'en a pas,
+T1 du séquenceur reste la vôtre), chaque vélocité et chaque racine de mesure d'origine.
+La v0.5 y ajoute l'articulation de la machine : **la basse ne tient jamais une note, elle
+re-frappe** (détail plus bas). Le fichier source de la banque est `riddims.json` ; les
 grilles imprimables sont dans `riddims_grids.md`.
 
 ## La banque
@@ -54,11 +57,15 @@ montent au-dessus (C#, B, A, B).
 - **Sans touche pressée**, il joue comme écrit : chaque mesure porte sa racine à elle
   (colonne « Racines »). C'est le motif de SLOOP Dub, pas un dégradé.
 - **Le clavier re-fonde** : toutes les mesures portent alors la fondamentale pressée, la
-  basse et les accords suivent, la mélodie transpose de la distance fondamentale pressée →
-  tonique du riddim, la batterie reste en place. Voir LISEZMOI.md pour la règle des touches.
-- **Les silences tiennent** (TIE Felucca) ; les pas marqués `cut` dans les grilles coupent
-  la note tenue (MT40_CUT). Les re-frappes de la même note, le rebond du Sleng Teng, sont
-  écrits telles quelles : chaque pas écrit frappe à nouveau.
+  basse et les accords suivent. Voir LISEZMOI.md pour la règle des touches.
+- **La basse re-frappe** (v0.5, `tools/mt40_bass.py`) : la machine pince, elle ne tient
+  pas. Chaque frappe écrite est suivie d'une **re-frappe de la même note** à la
+  double-croche suivante, plus légère ; une frappe forte qui tient trois pas re-frappe
+  encore à la croche suivante. Les re-frappes héritent de la note : MAJ/DOM7 les déplacent
+  avec elle, la dernière quinte de mesure et ses re-frappes descendent ensemble au b7.
+  Les silences restants tiennent (TIE Felucca) ; les pas marqués `cut` dans les grilles
+  coupent la note tenue (MT40_CUT). Le Sleng Teng re-frappait déjà chaque double-croche
+  (le groove `mtstut`, la transcription vérifiée) : il passe inchangé.
 - **La qualité de l'accord** choisie au clavier change la basse : MINEUR = le groove tel
   qu'écrit ; MAJEUR = la tierce mineure monte d'un demi-ton (+3 → +4) ; SEPTIÈME = comme le
   majeur, et la **dernière quinte de chaque mesure descend à la septième bémol** (+7 → +10),
@@ -68,23 +75,22 @@ montent au-dessus (C#, B, A, B).
 ## Du son, côté FM-1
 
 - **T3 la basse** : ANALOG, grave, bref — DEC court, un filtre fermé ; le MT-40 pince, il
-  ne tient pas. Le GATE 127 posé au chargement fait tenir les TIE ; l'enveloppe fait le pincé.
+  ne tient pas. Le GATE 127 posé au chargement fait tenir les TIE ; l'enveloppe fait le
+  pincé, les re-frappes font le rebond.
 - **T2 le skank** : un son carré ou orgue court ; l'upstroke reste noir (GATE 40).
 - **T4 la batterie** : le kit STD convient ; les niveaux de pistes (P_LN0..7) s'ajustent
   comme toujours.
-- **T1 la mélodie** : muette par défaut si vous voulez la machine pure — le MT-40 ne joue
-  que basse et batterie ; la mélodie et le skank sont la voix du sound system, à prendre ou à laisser.
+- **T1 libre** : le riddim n'y entre plus (v0.5) — posez-y votre ligne ; le MT-40 n'avait
+  que basse et batterie, et le skank reste la voix du sound system, à prendre ou à laisser.
 
 ## Le Sleng Teng pas à pas (pour la calibration)
 
 Riddim n° 17, 82 bpm, racines C#2 (MIDI 37) sur les quatre mesures, accords de skank
 C# / B / A / B (le skank reste au registre 57..68, ici 58 = A#3 :
 
-- mesures 1-2 (le groove `mtstut`) : C# sur le temps, puis trois doubles-croches à C#+1
-  (D) qui re-frappent, trois fois ; le pas 12 à C#+6 (G), coupé au pas 13 ; le pas 14 à
-  C#+5 (F#), coupé au pas 15.
-- mesures 3-4 (le groove `sleng_b`) : l'octave (G3), la septième bémol (B2), la quinte
-  (G#2), puis C# qui rebondit, et la quinte qui referme la mesure.
+- mesures 1 à 4 (le groove `mtstut`, identique partout) : C# sur le temps, puis trois
+  doubles-croches à C#+1 (D) qui re-frappent, trois fois ; le pas 12 à C#+6 (G), coupé au
+  pas 13 ; le pas 14 à C#+5 (F#), coupé au pas 15.
 - batterie (`mt_rock`) : kick sur les temps 1 et 3, caisse claire sur 2 et 4, charleys aux
   contretemps, et le fill de la mesure 4 (la caisse claire aux pas 12, 14 et 15).
 - skank (`mtup`) : l'upstroke du joueur, aux pas 2, 6, 10, 14.

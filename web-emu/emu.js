@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * MT-40X web emulator: main thread — faceplate, input, screen, LEDs, and the
- * MT-40X console (the riddim bank, the arm toggle, the four tracks' pattern view).
+ * MT-40X console (the riddim bank, the arm toggle, the tracks' pattern view).
  * The firmware itself runs in worklet.js (wasm inside the AudioWorklet).
  *
  * The faceplate geometry is traced from the FM-1 user manual's panel drawing
@@ -236,12 +236,12 @@ window.addEventListener('blur', () => { heldKeys.clear(); notesMask = 0; buttons
 /* ------------------------------------------------------- MT-40X console --- */
 /* The firmware's own menu stays the machine's control surface; the console
    below the device is the web sugar: the riddim bank one click away (the
-   RIDDIM row's own load), the arm toggle (the MT-40X row), and the four
-   tracks' pattern view read back from the firmware itself. */
+   RIDDIM row's own load), the arm toggle (the MT-40X row), and the tracks'
+   pattern view read back from the firmware itself. */
 const LANES = ['BD', 'SD', 'CP', 'CH', 'OH', 'TM', 'RS', 'CB'];
 const LANE_COL = ['#e07038', '#e0c23e', '#8ad0e0', '#4fbf6f', '#2f9e8f', '#c078e0', '#e08a3e', '#cfd3da'];
-const ROW_COL = ['#e0c23e', '#4fbf6f', '#4f8fe8', null];   // melody, skank, bass, drums (per-lane)
-const ROW_NAME = ['MÉLO', 'SKANK', 'BASSE', 'DRUMS'];
+const ROW_COL = ['#e0c23e', '#4fbf6f', '#4f8fe8', null];   // T1 (libre), skank, basse, batterie (per-lane)
+const ROW_NAME = ['T1', 'SKANK', 'BASSE', 'DRUMS'];
 const NOTE_NAME = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const noteName = n => NOTE_NAME[n % 12] + (Math.floor(n / 12) - 1);
 let riddimChips = [], armBtn = null, lastMt = -1, lastSeqSig = '';
@@ -347,7 +347,7 @@ async function buildRiddimList() {
         b.className = 'chip';
         b.dataset.rid = i;
         b.textContent = (i + 1).toString().padStart(2, '0') + ' ' + name;
-        b.title = 'charge le riddim dans les quatre pistes (' + bank.bpms[i] + ' BPM, comme chez SLOOP Dub)';
+        b.title = 'charge le riddim dans les trois pistes de la machine, T1 reste libre (' + bank.bpms[i] + ' BPM, comme chez SLOOP Dub)';
         chipRow.appendChild(b);
         riddimChips.push(b);
     });

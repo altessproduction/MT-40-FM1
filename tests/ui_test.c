@@ -1892,9 +1892,9 @@ static int test_menu_tabs(void)
 /* 1.2: MENU > AUDIO > TUNE and MENU > MIDI > MIDI IN edit the project's G_TUNE and G_ROUTE (up to 1.1.5 GLO > GLOBAL K4
  * and GLO > SYSTEM K3): the same values, stored with the project as before (a PROJECT save / load, the autosave), never
  * in the settings record */
-/* the MT-40X fork: a riddim into the four tracks (drums, bass, skank chords, melody), the
- * bass keyboard's chord (the key, +1 MIN, +2 DOM7, the same key again MAJ), the menu rows
- * and the SYNCHRO START */
+/* the MT-40X fork: a riddim into the machine's three tracks (drums, bass, skank chords;
+ * v0.5: no melody, T1 emptied and left to the user), the bass keyboard's chord (the key,
+ * +1 MIN, +2 DOM7, the same key again MAJ), the menu rows and the SYNCHRO START */
 static int test_mt40(void)
 {
     int bad = 0;
@@ -1910,22 +1910,24 @@ static int test_mt40(void)
     bad += check("MT-40X: the drums into T4, their velocities (the DRUM engine, its engine kept)",
                  dr->step[0].hit == 1u && dr->step[0].time == ST_NOTE && dr->step[0].vel == 122 &&
                  dr->step[4].hit == 2u && dr->step[1].hit == 0u && dr->step[0].n == 0);
-    bad += check("MT-40X: the bass into T3 as written, its rests TIEs, plucky gate, MONO",
+    bad += check("MT-40X: the bass into T3 as written, its re-strikes with it (the pluck at 1, the hold at 3), MONO",
                  bs->step[0].time == ST_NOTE && bs->step[0].note[0] == 38 && bs->step[0].n == 1 &&
-                 bs->step[14].note[0] == 41 && bs->step[1].time == ST_TIE &&
+                 bs->step[14].note[0] == 41 && bs->step[1].time == ST_NOTE && bs->step[1].note[0] == 38 &&
+                 bs->step[1].vel == 96 && bs->step[3].time == ST_TIE &&
                  bs->p[P_SGATE] == 127 && bs->p[P_VOICE] == V_MONO);
     bad += check("MT-40X: the skank into T2 as the bar's chord (57 + 38 % 12, MIN, POLY) with its velocity",
                  sk->step[2].n == 3 && sk->step[2].note[0] == 59 && sk->step[2].note[1] == 62 &&
                  sk->step[2].note[2] == 66 && sk->step[2].vel == 112 && sk->p[P_VOICE] == V_POLY);
-    bad += check("MT-40X: the melody into T1 as written, the transport still",
-                 mel->step[8].note[0] == 57 && mel->step[8].vel == 92 && song.playing == 0);
+    bad += check("MT-40X: T1 emptied (no melody in the bank, the track stays the user's), the transport still",
+                 mel->step[8].time == ST_REST && mel->step[8].n == 0 && mel->step[0].time == ST_REST &&
+                 song.playing == 0);
     bad += check("MT-40X: a key is the chord (MAJ, the SYNCHRO START asked while stopped)",
                  mt40_key_press(7u) == 1u && transport_req == 1u && mt40_root == 48 && mt40_qual == MT40_Q_MAJ);
     transport_req = 0;
-    bad += check("MT-40X: the whole accompaniment re-voiced on the press, the drums still",
+    bad += check("MT-40X: the whole accompaniment re-voiced on the press, T1 still empty, the drums still",
                  bs->step[0].note[0] == 48 && bs->step[14].note[0] == 52 &&
                  sk->step[2].note[0] == 57 && sk->step[2].note[1] == 61 && sk->step[2].note[2] == 64 &&
-                 mel->step[8].note[0] == 67 && dr->step[0].hit == 1u);
+                 mel->step[8].time == ST_REST && dr->step[0].hit == 1u);
     bad += check("MT-40X: the key above the root plays it MIN",
                  mt40_key_press(8u) == 1u && mt40_qual == MT40_Q_MIN && mt40_root == 48 &&
                  bs->step[14].note[0] == 51 && sk->step[2].note[1] == 60);

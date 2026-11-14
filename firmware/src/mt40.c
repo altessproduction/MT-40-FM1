@@ -1,18 +1,19 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 MT-40X contributors (Felucca by Leo Kuroshita / Hugelton Instruments,
  * riddim bank by altessproduction's SLOOP Dub 1.6, both GPL-3.0-only) */
-/* MT-40X: mt40.h's side. One riddim = the four tracks:
+/* MT-40X: mt40.h's side. One riddim = the machine's three tracks:
  *   T4 the drums (the DRUM engine, one lane hit a step at the most, velocities kept),
- *   T3 the bass (the groove rides the bar's root; a rest HOLDS, written as a TIE;
- *      MT40_CUT releases: the plucked tails the MT-40's bass lives on),
- *   T2 the skank (the stabs, real chords: the bar's root with the chord's quality),
- *   T1 the melody (as written; the keyboard transposes it with the chord).
+ *   T3 the bass (the groove rides the bar's root and never holds -- every note re-strikes
+ *      as the machine plucks it, tools/mt40_bass.py; a rest HOLDS the re-strike, written
+ *      as a TIE; MT40_CUT releases: the plucked tails the MT-40's bass lives on),
+ *   T2 the skank (the stabs, real chords: the bar's root with the chord's quality).
+ *   T1 stays the user's: the melody was SLOOP Dub's toaster's voice, the machine has none
+ *   (v0.5 dropped it; the load empties the track, its sound and its settings stay).
  * The keyboard: key n (53 + k) is a chord: n the root MAJ, n + 1 MIN of n - 1, n + 2
  * DOM7 of n - 2; the same key again takes MAJ back (every root is reachable). The roots
  * ride the bass range (28..50, one octave down as needed); the whole accompaniment is
- * re-voiced on the press, the melody by the root's distance to the riddim's own. Nothing
- * pressed: the riddim plays as written, its four bars' own roots. With the transport
- * stopped the first chord SYNCHRO-STARTs it (the MT-40's). */
+ * re-voiced on the press. Nothing pressed: the riddim plays as written, its four bars'
+ * own roots. With the transport stopped the first chord SYNCHRO-STARTs it (the MT-40's). */
 
 #include "mt40.h"
 #include "mt40_riddims.h"
@@ -85,19 +86,21 @@ static uint32_t mt40_clamp_root(uint32_t n)          /* a key's pitch into the b
 
 /* the variant of a degree as the keyboard's quality wants it: MIN as written, MAJ raises
  * the minor third, DOM7 is MAJ with the bar's last fifth flat (the turnaround). The same
- * rules tools/gen_mt40_riddims.py documents; CALIBRATION.md is where they get checked */
-static uint32_t mt40_deg(uint32_t deg, uint32_t qual, uint32_t last7, uint32_t s)
+ * rules tools/gen_mt40_riddims.py documents; CALIBRATION.md is where they get checked.
+ * in7: the step rides the bar's last fifth -- the note AND its re-strikes (the pluck is
+ * the same note, it goes flat with it) */
+static uint32_t mt40_deg(uint32_t deg, uint32_t qual, uint32_t in7)
 {
     if (deg == 3u && qual != MT40_Q_MIN)
         return 4u;
-    if (qual == MT40_Q_DOM7 && deg == 7u && s == last7)
+    if (qual == MT40_Q_DOM7 && deg == 7u && in7)
         return 10u;
     return deg;
 }
 
-/* the four tracks re-voiced: root < 0 as written (the riddim's own four bar roots),
+/* the three tracks re-voiced: root < 0 as written (the riddim's own four bar roots),
  * root >= 0 the keyboard's chord (all four bars its root, its quality). noinline: a
- * chord press re-voices 192 steps, out of the audio ISR's keyboard loop */
+ * chord press re-voices 128 steps, out of the audio ISR's keyboard loop */
 static __attribute__((noinline)) void mt40_voice(int32_t root)
 {
     const mt40_riddim_t *r;
@@ -108,11 +111,19 @@ static __attribute__((noinline)) void mt40_voice(int32_t root)
     for (b = 0; b < 4u; b++) {
         uint32_t rroot = root >= 0 ? (uint32_t)root : r->roots[b];
         uint32_t qual = root >= 0 ? mt40_qual : r->skank_qual;
-        int32_t mel_d = root >= 0 ? (int32_t)rroot - (int32_t)r->roots[0] : 0;
-        uint32_t last7 = 0xFFFFFFFFu;                /* the bar's last fifth (DOM7's turnaround) */
+        uint32_t last7 = 0xFFFFFFFFu, last7end = 0xFFFFFFFFu;   /* the bar's last fifth's
+                                          * run (DOM7's turnaround): the strike, its
+                                          * re-strikes with it */
         for (s = b * 16u; s < b * 16u + 16u; s++)
             if (r->bass_deg[s] == 7u)
                 last7 = s;
+        if (last7 != 0xFFFFFFFFu) {
+            last7end = last7;
+            while (last7end + 1u < b * 16u + 16u && r->bass_deg[last7end + 1u] == 7u)
+                last7end++;                  /* forward: the plucks of that fifth */
+            while (last7 > b * 16u && r->bass_deg[last7 - 1u] == 7u)
+                last7--;                     /* back: the strike of the run (a pluck at 15) */
+        }
         /* T3 the bass: a written note strikes, a rest holds it (TIE), MT40_CUT ends it */
         for (s = b * 16u; s < b * 16u + 16u; s++) {
             uint32_t deg = r->bass_deg[s];
@@ -123,7 +134,8 @@ static __attribute__((noinline)) void mt40_voice(int32_t root)
                 mt40_rest(t, s);
                 t->step[s].time = ST_TIE;            /* a hold the engine keeps while it sounds */
             } else {
-                mt40_note(t, s, (uint8_t)(rroot + mt40_deg(deg, qual, last7, s)), r->bass_vel[s], 0);
+                mt40_note(t, s, (uint8_t)(rroot + mt40_deg(deg, qual,
+                                                           s >= last7 && s <= last7end)), r->bass_vel[s], 0);
             }
         }
         /* T2 the skank: the bar's chord, the stab's velocity; the rests release */
@@ -134,18 +146,6 @@ static __attribute__((noinline)) void mt40_voice(int32_t root)
             } else {
                 uint32_t cr = root >= 0 ? 57u + rroot % 12u : 57u + r->chords[b] % 12u;
                 mt40_chord(t, s, cr, qual, r->skank_vel[s]);   /* the stab's register stays the bank's */
-            }
-        }
-        /* T1 the melody: as written, the keyboard's distance applied */
-        for (s = b * 16u; s < b * 16u + 16u; s++) {
-            track_t *t = &trk[0];
-            uint32_t n = r->mel_note[s];
-            if (n == MT40_REST) {
-                mt40_rest(t, s);
-                t->step[s].time = ST_TIE;
-            } else {
-                int32_t x = (int32_t)n + mel_d;
-                mt40_note(t, s, (uint8_t)(x < 0 ? 0 : x > 127 ? 127 : x), r->mel_vel[s], 0);
             }
         }
     }
@@ -197,13 +197,12 @@ static void mt40_sounds(void)
 {
     /* E0 WAVE (0 SAW, 1 SQR, 2 TRI, 3 SIN, 4 PWM, 5 SYNC, 6 SUB), E1 DTN, E2 MIX, E3 NOIS,
      * E4 CUT, E5 RES, E6 DRV, E7 KTR; then the amp env ATK DEC SUS REL (SUS %). As
-     * mt40_drums' kit: written in place, the engine switch lands at a block start (voice.c) */
+     * mt40_drums' kit: written in place, the engine switch lands at a block start (voice.c)
+     * T1 keeps whatever the user plays on it: the load only empties its steps */
     static const int16_t BASS[8] = {1, 0, 0, 0, 50, 45, 30, 100};   /* the MT-40's hollow square pluck */
-    static const int16_t LEAD[8] = {4, 0, 0, 0, 85, 15, 0, 64};     /* the thin pulse the melodies ride */
     static const int16_t SKNK[8] = {4, 0, 0, 0, 78, 12, 10, 64};    /* the stab's pluck, shorter */
     mt40_tone(&trk[2], BASS, 0, 55, 35, 30);         /* T3: plucky, it decays even on its TIEs */
     mt40_tone(&trk[1], SKNK, 0, 50, 25, 25);         /* T2: the stab dies within its short gate */
-    mt40_tone(&trk[0], LEAD, 0, 40, 90, 40);         /* T1: it rings, the TIEs hold it */
 }
 
 void mt40_load(uint32_t rid)
@@ -219,17 +218,19 @@ void mt40_load(uint32_t rid)
     mt40_qual = MT40_Q_MIN;
     r = MT40_RIDDIMS[rid];
     mt40_drums(r);
-    for (i = 0; i < 3u; i++) {                       /* T1 mel, T2 skank, T3 bass: their grid */
-        track_t *t = &trk[i];
+    for (i = 0; i < MT40_STEPS; i++)                 /* T1 emptied: the riddim has no melody,
+                                                      * the track stays the user's (its sound too) */
+        mt40_rest(&trk[0], i);
+    for (i = 0; i < 2u; i++) {                       /* T2 skank, T3 bass: their grid */
+        track_t *t = &trk[1 + i];
         t->p[P_SLEN] = 64;
         t->p[P_SDIV] = 2;
     }
-    trk[0].p[P_SGATE] = 127;                         /* the melody rings (its TIEs hold it) */
     trk[1].p[P_SGATE] = 40;                          /* the skank stabs, short (P_VOICE POLY below) */
     trk[1].p[P_VOICE] = V_POLY;                      /* the stabs are real chords */
     trk[2].p[P_SGATE] = 127;                         /* the bass rings over its TIEs */
     trk[2].p[P_VOICE] = V_MONO;                      /* one note, as a bass */
-    mt40_sounds();                                   /* the MT-40's kind of tones on T1..T3 */
+    mt40_sounds();                                   /* the MT-40's kind of tones on T2, T3 */
     mt40_voice(-1);                                  /* as written, until a key is pressed */
     song.g[G_BPM] = (int16_t)r->bpm;                 /* the riddim's tempo (MENU > AUDIO > BPM) */
 }

@@ -40,10 +40,10 @@ package <code>mt40x_v1.8.2-0.4.fwsc</code>, a fork of Felucca 1.8.2 with the 28-
 between the tabs (<em>DISPLAY · CONTROL · AUDIO · MIDI · SYSTEM</em>), <strong>PRESETS</strong> moves between rows,
 <strong>KNOB 1–4</strong> or <strong>OCT+/OCT−</strong> change the selected row's value. A short HOME press closes it.</p>
 <ol>
-  <li><strong>MENU &gt; AUDIO &gt; RIDDIM</strong> — one knob turn loads a riddim at once: its four tracks
-      (T1 melody, T2 skank chords, T3 bass, T4 drums), its tempo (66…172 BPM) <strong>and its MT-40 kind of
-      sounds</strong> (Casiotone-style ANALOG tones on T1..T3; your LEVEL, PAN, FX sends and INSERT stay —
-      tweak the track's OSC/FLT to taste).</li>
+  <li><strong>MENU &gt; AUDIO &gt; RIDDIM</strong> — one knob turn loads a riddim at once: the machine's three tracks
+      (T2 skank chords, T3 bass, T4 drums — T1 stays yours, the MT-40 has no melody part), its tempo (66…172 BPM)
+      <strong>and its MT-40 kind of sounds</strong> (Casiotone-style ANALOG tones on T2, T3; your LEVEL, PAN, FX sends and
+      INSERT stay — tweak the track's OSC/FLT to taste).</li>
   <li><strong>MENU &gt; AUDIO &gt; MT-40X = ON</strong> — the keys become the MT-40's bass keyboard.</li>
   <li><strong>PLAY</strong> — or just press a key while stopped: <em>synchro start</em>, the first chord starts the transport.</li>
   <li><strong>Press keys</strong> to re-root the whole pattern live. Nothing pressed: the riddim plays exactly as written.</li>
@@ -52,12 +52,12 @@ between the tabs (<em>DISPLAY · CONTROL · AUDIO · MIDI · SYSTEM</em>), <stro
 <h2>The bass keyboard</h2>
 <table>
   <tr><th>Key</th><th>What it does</th></tr>
-  <tr><td>Any key (the 27 keys, MIDI 53…79 / F3…G5)</td><td>Root of the whole accompaniment, <strong>major</strong>. The key itself sounds nothing — it re-voices the four tracks (192 steps). Its pitch class is folded into the bass register (MIDI 28…50).</td></tr>
+  <tr><td>Any key (the 27 keys, MIDI 53…79 / F3…G5)</td><td>Root of the whole accompaniment, <strong>major</strong>. The key itself sounds nothing — it re-voices the three tracks (128 steps). Its pitch class is folded into the bass register (MIDI 28…50).</td></tr>
   <tr><td>The key a semitone <em>above</em> the held root</td><td><strong>minor</strong> of that root</td></tr>
   <tr><td>Two semitones <em>above</em> the held root</td><td><strong>dominant 7th</strong> of that root (the bar's last fifth flattens — the turnaround)</td></tr>
   <tr><td>The same key pressed again</td><td>Back to <strong>major</strong> of that key (every root stays reachable)</td></tr>
 </table>
-<div class="note">Drums never transpose. Bass, skank chords and melody follow the keyboard.
+<div class="note">Drums never transpose. Bass and skank chords follow the keyboard.
 MT-40X armed, the keys are no synth keys — play over it with MT-40X OFF, or from MIDI.</div>
 
 <h2>MENU &gt; AUDIO (the two MT-40X rows)</h2>
@@ -70,14 +70,16 @@ MT-40X armed, the keys are no synth keys — play over it with MT-40X OFF, or fr
 <h2>What a riddim loads</h2>
 <table>
   <tr><th>Track</th><th>Content</th><th>Settings set on load</th></tr>
-  <tr><td>T1</td><td>the riddim's melody</td><td>GATE 127 (rests hold the note)</td></tr>
+  <tr><td>T1</td><td><strong>yours</strong> — the riddim has no melody (the MT-40's three parts only)</td><td>nothing set (your sound)</td></tr>
   <tr><td>T2</td><td>the skank: the bar's chord (root, third, fifth, + seventh)</td><td>GATE 40, VOICE POLY</td></tr>
-  <tr><td>T3</td><td>the bass: the groove over the bar's root</td><td>GATE 127, VOICE MONO</td></tr>
+  <tr><td>T3</td><td>the bass: the groove over the bar's root, re-struck as the machine plucks it</td><td>GATE 127, VOICE MONO</td></tr>
   <tr><td>T4</td><td>the drums (one hit per step at most, original velocities)</td><td>LEN 64, DIV 1/16</td></tr>
 </table>
 <p>Patterns are 4 bars of 16 sixteenths (64 steps); the fill lives inside bar 4, as in SLOOP Dub
 (<span class="kbd">GLO</span>+<span class="kbd">E4</span> FILL conditions stay available on steps you mark yourself).
-A rest <em>holds</em> (TIE); a <code>cut</code> step ends the held note (the Sleng Teng's plucked tails).</p>
+The bass never sustains: every strike is <em>struck again</em> right after, lighter — the machine's pluck
+(the Sleng Teng stutters on every sixteenth, that is its bounce). A remaining rest <em>holds</em> (TIE); a
+<code>cut</code> step ends the held note (the Sleng Teng's plucked tails).</p>
 
 <h2>The 28 riddims (SLOOP Dub 1.6 bank, roots as written)</h2>
 <table>

@@ -79,8 +79,8 @@ for (let s = 0; s < 64; s++) {
     if (e.emu_seq_note(1, s) !== 255 && e.emu_seq_note(1, s) !== 254) skank++;
     if (e.emu_seq_note(0, s) !== 255 && e.emu_seq_note(0, s) !== 254) mel++;
 }
-check(`mt40: the four tracks loaded (drums ${drums}, bass ${bass}, skank ${skank}, melody ${mel})`,
-      drums > 4 && bass > 4 && skank > 2 && mel > 2);
+check(`mt40: the machine's three tracks loaded, T1 left empty (drums ${drums}, bass ${bass}, skank ${skank}, T1 ${mel})`,
+      drums > 4 && bass > 4 && skank > 2 && mel === 0);
 
 /* transport: PLAY from stop, then the audio path (before any key: no synchro start yet) */
 e.emu_input(0, 1 << 12);                       /* PLAY (panel.btn[B_PLAY] = 12) */
