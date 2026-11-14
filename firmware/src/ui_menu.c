@@ -432,6 +432,9 @@ static void draw_menu(void)
           (uint32_t)(song.g[G_TUNE] + 64) * 8191u + (uint32_t)song.g[G_ROUTE] * 27449u +   /* (1.2: the project's rows) */
           (song.mch[0] | (uint32_t)song.mch[1] << 8 | (uint32_t)song.mch[2] << 16 | (uint32_t)song.mch[3] << 24) *
           2246822519u +                                   /* (1.5.5: T1..T4 CHANNEL) */
+          (uint32_t)mt40_on * 3571u + (uint32_t)(mt40_rid + 1) * 104729u +
+                                            /* (the MT-40X fork: MT-40X's and RIDDIM's values redraw their rows —
+                                             * without them a load or an arm changed the sound, not the screen) */
           (ui.menu == 2 ? ui.menu_scroll * 48611u : 0u) + (ui.menu == 3 ? info_sig() * 2654435761u : 0u);
     if (!ui.force && sig == ui.menu_sig) {
         if (ui.menu == 1 && mt.pos != pos0) {          /* only the tabs slid: their strip */

@@ -176,6 +176,36 @@ static void mt40_drums(const mt40_riddim_t *r)
     t->p[P_SGATE] = 100;
 }
 
+/* the MT-40's kind of tones, posed on every load: the Casiotone timbres are simple
+ * attack-decay waves, ANALOG approximates them well enough to play a riddim right away
+ * (the faithful 22-tone bank is the next calibration, the riddims' own). The user's
+ * LEVEL, PAN, sends and INSERT stay; an engine change lands at a block start (voice.c) */
+static void mt40_tone(track_t *t, const int16_t e[8], int16_t atk, int16_t dec, int16_t sus, int16_t rel)
+{
+    uint32_t i;
+    t->eng_req = 0u;                                 /* ENGI_ANALOG (ENGINES[0]) */
+    for (i = 0; i < 8u; i++)
+        t->p[P_E0 + (int32_t)i] = e[i];
+    t->p[P_ATK] = atk;
+    t->p[P_DEC] = dec;
+    t->p[P_SUS] = sus;
+    t->p[P_REL] = rel;
+    t->user = 0u;                                    /* the sound is ours, no user slot behind it */
+}
+
+static void mt40_sounds(void)
+{
+    /* E0 WAVE (0 SAW, 1 SQR, 2 TRI, 3 SIN, 4 PWM, 5 SYNC, 6 SUB), E1 DTN, E2 MIX, E3 NOIS,
+     * E4 CUT, E5 RES, E6 DRV, E7 KTR; then the amp env ATK DEC SUS REL (SUS %). As
+     * mt40_drums' kit: written in place, the engine switch lands at a block start (voice.c) */
+    static const int16_t BASS[8] = {1, 0, 0, 0, 50, 45, 30, 100};   /* the MT-40's hollow square pluck */
+    static const int16_t LEAD[8] = {4, 0, 0, 0, 85, 15, 0, 64};     /* the thin pulse the melodies ride */
+    static const int16_t SKNK[8] = {4, 0, 0, 0, 78, 12, 10, 64};    /* the stab's pluck, shorter */
+    mt40_tone(&trk[2], BASS, 0, 55, 35, 30);         /* T3: plucky, it decays even on its TIEs */
+    mt40_tone(&trk[1], SKNK, 0, 50, 25, 25);         /* T2: the stab dies within its short gate */
+    mt40_tone(&trk[0], LEAD, 0, 40, 90, 40);         /* T1: it rings, the TIEs hold it */
+}
+
 void mt40_load(uint32_t rid)
 {
     const mt40_riddim_t *r;
@@ -199,6 +229,7 @@ void mt40_load(uint32_t rid)
     trk[1].p[P_VOICE] = V_POLY;                      /* the stabs are real chords */
     trk[2].p[P_SGATE] = 127;                         /* the bass rings over its TIEs */
     trk[2].p[P_VOICE] = V_MONO;                      /* one note, as a bass */
+    mt40_sounds();                                   /* the MT-40's kind of tones on T1..T3 */
     mt40_voice(-1);                                  /* as written, until a key is pressed */
     song.g[G_BPM] = (int16_t)r->bpm;                 /* the riddim's tempo (MENU > AUDIO > BPM) */
 }

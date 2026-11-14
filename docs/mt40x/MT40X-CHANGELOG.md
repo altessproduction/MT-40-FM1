@@ -1,5 +1,23 @@
 # MT-40X — changelog
 
+## v0.4 (mt40x_v1.8.2-0.4) — les sons MT-40 et l'affichage du MENU
+
+- **Les sons MT-40 posés au chargement** (`mt40.c mt40_sounds`) : chaque chargement de
+  riddim pose sur T1 (mélodie), T2 (skank) et T3 (basse) des timbres ANALOG dans l'esprit
+  Casiotone — T3 la pluck carrée creuse (SQR, CUT 50, un peu de drive, ENV pluck), T1
+  l'impulsion fine (PWM, CUT 85, qui sonne), T2 l'attaque courte (PWM, SUS bas). Le
+  chargement garde vos LEVEL, PAN, envois et INSERT ; le moteur change à la limite de bloc
+  (voice.c), comme l'UI. Les approximations des 22 timbres réels restent la calibration à
+  venir (`CALIBRATION.md`).
+- **L'affichage du MENU suit les valeurs MT-40X** (`ui_menu.c`) : `mt40_on` et `mt40_rid`
+  entrent dans la signature de redessin du MENU — sans eux, tourner OCT+ sur RIDDIM ou
+  basculer MT-40X changeait le son sans changer l'écran (la ligne se rafraîchissait au
+  geste suivant seulement). Même motif que « SCREEN OFF's value redraws its row » (#157).
+- Le paquet : `docs/firmware/mt40x_v1.8.2-0.4.fwsc` (610 286 B), la release
+  `build/release-0.4/`. L'émulateur recompilé (wasm 1 250 693 B, `docs/dub/` synchronisé) ;
+  le smoke test v0.4 passe : AUDIO-PATH-OK, le clavier re-racine, un riddim charge sur un
+  autre. `ui_test` passe sur les deux builds (défaut et FELUCCA_CPU2=0).
+
 ## v0.3 (mt40x_v1.8.2-0.3) — l'identité du hub et le dossier de soumission
 
 - **L'identité du paquet devient `FM-1_23456`** — le numéro de MT-40X au Firmware Hub

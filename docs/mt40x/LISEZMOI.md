@@ -1,10 +1,21 @@
-# MT-40X v0.3 — le Casio MT-40/41 sur le M-VAVE FM-1
+# MT-40X v0.4 — le Casio MT-40/41 sur le M-VAVE FM-1
 
 MT-40X est une fourche (fork) du firmware libre **Felucca v1.8.2** (Hügelton Instruments,
 GPL-3.0) qui ajoute au FM-1 l'accompagnement automatique du **Casio MT-40 / MT-41** : la
 banque de riddims, le clavier de basse, le synchro start. La banque de riddims est celle de
 **SLOOP Dub 1.6** (altessproduction, <https://github.com/altessproduction/sloop-dub-fm1>,
 GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le firmware.
+
+## Nouveau dans la v0.4 (par rapport à la v0.3)
+
+- **Les sons MT-40 au chargement** : chaque chargement de riddim pose sur T1 (mélodie),
+  T2 (skank) et T3 (basse) des timbres ANALOG dans l'esprit Casiotone — la pluck carrée
+  creuse de la basse, l'impulsion fine des mélodies, l'attaque courte du skank. Vos LEVEL,
+  PAN, envois d'effets et INSERT restent ; retouchez l'OSC/FLT de la piste à votre goût.
+  Ce sont des approximations : la banque fidèle des 22 timbres de la machine est la
+  calibration à venir, comme les riddims l'ont été.
+- **L'affichage du MENU suit** : changer RIDDIM ou basculer MT-40X redessine la ligne
+  aussitôt (la signature de redessin du MENU connaissait ces deux valeurs de trop).
 
 ## Nouveau dans la v0.3 (par rapport à la v0.2.1)
 
@@ -36,7 +47,7 @@ GPL-3.0) : **les vingt-huit riddims exactement**, convertis tels quels dans le f
 1. **Sauvegardez d'abord** : projets, presets utilisateur, échantillons (SAVE > PROJECT, ou
    l'éditeur web). Une installation remplace le firmware, pas vos données flash — mais une
    sauvegarde avant toute manipulation de firmware est la règle.
-2. Copiez `mt40x_v1.8.2-0.3.fwsc` sur une clé USB (FAT32) ou passez par l'installateur web.
+2. Copiez `mt40x_v1.8.2-0.4.fwsc` sur une clé USB (FAT32) ou passez par l'installateur web.
    Sur le FM-1, mode mise à jour via M-UPGRADE, choisissez le paquet, l'appareil redémarre.
    L'écran de démarrage affiche « MT-40X v1.8.2-mt40x ».
 3. Le reste de Felucca 1.8.2 est intact : moteurs, presets, projets, éditeur web, MIDI.
@@ -96,7 +107,7 @@ Les gestes, l'esprit MT-40 :
 
 ## Recompiler et recalibrer
 
-La source complète (GPL-3.0) est dans `mt40x_v1.8.2-0.3_source.zip`. Le workflow de
+La source complète (GPL-3.0) est dans `mt40x_v1.8.2-0.4_source.zip`. Le workflow de
 calibration — grilles imprimables `riddims_grids.md`, correction de `riddims.json`,
 régénération, recompilation — est dans `CALIBRATION.md`.
 

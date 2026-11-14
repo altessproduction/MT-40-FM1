@@ -100,10 +100,11 @@ Puis, pas à pas :
 
 1. **Sauvegardez** vos projets, presets et échantillons (SAVE &gt; PROJECT, ou l'éditeur
    web) — la règle avant toute manipulation de firmware.
-2. **Flashez** `mt40x_v1.8.2-0.3.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
+2. **Flashez** `mt40x_v1.8.2-0.4.fwsc` (voir [§6](#6-installer-le-firmware)). L'écran de
    démarrage affiche « MT-40X v1.8.2-mt40x ».
 3. **MENU &gt; AUDIO &gt; RIDDIM** : sur la ligne RIDDIM, tournez **OCT+** — chaque cran
-   charge le riddim (les quatre pistes, le tempo). Le nom s'affiche comme valeur de la ligne.
+   charge le riddim (les quatre pistes, le tempo, **les sons MT-40**) et le nom s'affiche
+   aussitôt à l'écran.
 4. **MENU &gt; AUDIO &gt; MT-40X : ON** — remontez d'une ligne (PRESETS), OCT+ encore :
    les touches deviennent le clavier de basse.
 5. **PLAY** — ou pressez une première touche : synchro start.
@@ -116,7 +117,13 @@ Puis, pas à pas :
 | T3 | la basse : le groove au-dessus de la racine de mesure | GATE 127, VOICE MONO |
 | T4 | la batterie (un hit par pas au plus, vélocités d'origine) | LEN 64, DIV 1/16 |
 
-**Limites connues (v0.3)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
+**Les sons MT-40 posés au chargement (v0.4)** : T1..T3 reçoivent des timbres ANALOG dans
+l'esprit Casiotone — T3 la pluck carrée creuse de la basse, T1 l'impulsion fine des
+mélodies, T2 l'attaque courte du skank — posés à chaque chargement de riddim, avec vos
+LEVEL, PAN, envois d'effets et INSERT conservés. Ce sont des approximations à ajuster
+l'OSC/FLT de la piste ; la banque fidèle des 22 timbres est la calibration à venir.
+
+**Limites connues (v0.4)** : l'état MT-40X (riddim chargé, accord courant) n'est pas
 sauvegardé dans le projet — rechargez après extinction (les pistes, elles, restent si vous
 sauvegardez le projet) ; MT-40X armé, les touches ne sonnent pas (jouez au MIDI ou
 désarmez) ; le registre du skank reste celui de la banque (57…68) ; les patterns font 4
@@ -180,7 +187,7 @@ chemin audio, le clavier MAJ / +1 MIN / +2 DOM7 — finit sur `AUDIO-PATH-OK`.
 
 ## 6. Installer le firmware
 
-Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.3.fwsc`** (dans les assets de
+Le paquet d'installation est **`docs/firmware/mt40x_v1.8.2-0.4.fwsc`** (dans les assets de
 la release GitHub, avec le `.bin` applicatif, les `SHA256SUMS` et les licences). Il
 **inclut le loader de mise à jour** : vous pouvez toujours en ressortir, vers V15 ou vers
 un autre firmware.
@@ -237,7 +244,7 @@ JIELI_TOOLCHAIN=/chemin/toolchain AC79_SDK=/chemin/fw-AC79_AIoT_SDK ./build.sh -
 
 - Prérequis et SDK : **[BUILDING.md](BUILDING.md)** (toolchain JieLi pi32v2 —
   `tools/get_toolchain.sh` — et SDK AC79 ; Pillow pour les tables générées).
-- Le build produit `build/mt40x_v1.8.2-0.3.fwsc` et `build/release-0.3/` (paquet, `.bin`,
+- Le build produit `build/mt40x_v1.8.2-0.4.fwsc` et `build/release-0.4/` (paquet, `.bin`,
   `SHA256SUMS`, licences, attribution des échantillons).
 - **La banque de riddims** : `riddims.json` est la source de vérité ;
   `python3 tools/gen_mt40_riddims.py` régénère `firmware/src/mt40_riddims.h` et les grilles
